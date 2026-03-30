@@ -1,0 +1,268 @@
+/* src/styles/analysis.css */
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.score-card, .breakdown-card, .kw-card, .suggestions-section, .history-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  animation: fadeUp 0.4s ease-out backwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.score-ring-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 1rem;
+}
+
+.score-ring-wrap svg {
+  transform: rotate(-90deg);
+  width: 160px;
+  height: 160px;
+}
+
+.score-num-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-big {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+.score-denom {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.score-grade {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2ECC8A;
+  margin-bottom: 0.5rem;
+}
+
+.score-detail {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.bk-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 1.2rem;
+}
+
+.bk-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.bk-label {
+  width: 160px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.bk-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 1rem;
+}
+
+.bk-bar {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.bk-val {
+  width: 40px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.keywords-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kw-card {
+  animation-delay: 0.1s;
+}
+
+.kw-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.kw-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.kw-tag {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.kw-found {
+  background: rgba(46, 204, 138, 0.1);
+  color: #2ECC8A;
+  border: 1px solid rgba(46, 204, 138, 0.2);
+}
+
+.kw-miss {
+  background: rgba(224, 92, 92, 0.1);
+  color: #E05C5C;
+  border: 1px solid rgba(224, 92, 92, 0.2);
+}
+
+.suggestions-section {
+  margin-bottom: 2rem;
+  animation-delay: 0.2s;
+}
+
+.sug-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 1.2rem;
+}
+
+.sug-row {
+  display: flex;
+  align-items: flex-start;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.sug-row-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.25rem;
+  flex-shrink: 0;
+}
+
+.sug-row-content {
+  flex: 1;
+}
+
+.sug-row-content p {
+  margin: 0 0 0.3rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.sug-row-content span {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.impact-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 1rem;
+}
+
+.impact-hi { background: rgba(224, 92, 92, 0.15); color: #E05C5C; }
+.impact-md { background: rgba(79, 110, 247, 0.15); color: #4F6EF7; }
+
+.history-card {
+  animation-delay: 0.3s;
+}
+
+.history-head {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 1.2rem;
+}
+
+.hist-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.hist-date {
+  width: 80px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.hist-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin: 0 1rem;
+  overflow: hidden;
+}
+
+.hist-bar {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+.hist-val {
+  width: 30px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 700;
+}

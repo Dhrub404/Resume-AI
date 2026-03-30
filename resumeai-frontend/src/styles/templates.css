@@ -1,0 +1,230 @@
+/* src/styles/templates.css */
+
+.templates-header {
+  margin-bottom: 2rem;
+}
+
+.templates-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 0.5rem;
+}
+
+.templates-header p {
+  font-size: 1rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.templates-filters {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.templates-filters::-webkit-scrollbar {
+  height: 4px;
+}
+.templates-filters::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.filter-btn {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+}
+
+.filter-btn.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tpl-card {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+  animation: fadeUp 0.4s ease-out backwards;
+}
+
+.tpl-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.tpl-card.selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6, 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tpl-preview {
+  height: 200px;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tpl-preview::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 60%);
+  z-index: 0;
+}
+
+.tpl-preview > div {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  transform: scale(1.4);
+}
+
+.tpl-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  z-index: 2;
+  letter-spacing: 0.5px;
+}
+
+.badge-popular {
+  background: #f59e0b;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.badge-new {
+  background: #10b981;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.selected-check {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 24px;
+  height: 24px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+}
+
+.tpl-body {
+  padding: 1.2rem;
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.tpl-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 0.3rem;
+}
+
+.tpl-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.tpl-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 36px;
+}
+
+.tpl-selected-label {
+  width: 100%;
+  text-align: center;
+  color: #3b82f6;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.tpl-preview-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  padding: 0.4rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tpl-preview-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tpl-use-btn {
+  flex: 1;
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 0.4rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tpl-use-btn:hover {
+  background: #2563eb;
+}
+
+.tpl-card:nth-child(1) { animation-delay: 0.05s; }
+.tpl-card:nth-child(2) { animation-delay: 0.10s; }
+.tpl-card:nth-child(3) { animation-delay: 0.15s; }
+.tpl-card:nth-child(4) { animation-delay: 0.20s; }
+.tpl-card:nth-child(5) { animation-delay: 0.25s; }
+.tpl-card:nth-child(6) { animation-delay: 0.30s; }
+.tpl-card:nth-child(7) { animation-delay: 0.35s; }
+.tpl-card:nth-child(8) { animation-delay: 0.40s; }

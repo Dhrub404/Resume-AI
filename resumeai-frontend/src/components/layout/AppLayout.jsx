@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../../api';
 import '../../styles/layout.css';
 
-const AppLayout = ({ title, children }) => {
+const AppLayout = ({ title, children, topbarRight }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
@@ -82,6 +82,7 @@ const AppLayout = ({ title, children }) => {
         <header className="app-header">
           <h1 className="header-title">{title}</h1>
           <div className="header-actions">
+            {topbarRight}
             <button className="btn-upgrade">Upgrade to Pro</button>
             <div className="notification-bell">
               <div className="bell-badge"></div>
