@@ -64,6 +64,9 @@ export default function DashboardPage() {
     fetchResumes();
   }, []);
 
+  const bestScore = resumes.length > 0 ? Math.max(...resumes.map(r => r.score || 0)) : 0;
+  const aiTipsUsed = 0; // Will be connected later 
+  
   return (
     <AppLayout title="Dashboard">
       <div className="stats-row">
@@ -74,18 +77,20 @@ export default function DashboardPage() {
         </div>
         <div className="stat-card">
           <div className="stat-label">Best ATS Score</div>
-          <div className="stat-val" style={{ color: 'var(--success)' }}>87</div>
-          <div className="stat-badge badge-up">+5 pts improved</div>
+          <div className="stat-val" style={{ color: bestScore > 75 ? 'var(--success)' : 'var(--warning)' }}>
+            {isLoading ? '-' : bestScore}
+          </div>
+          <div className="stat-badge badge-up">Across all resumes</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">AI Suggestions Used</div>
-          <div className="stat-val">23</div>
-          <div className="stat-badge badge-up">12 accepted</div>
+          <div className="stat-val">{isLoading ? '-' : aiTipsUsed}</div>
+          <div className="stat-badge badge-up">Since you joined</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">PDF Downloads</div>
-          <div className="stat-val">7</div>
-          <div className="stat-badge badge-down">Last: 2 days ago</div>
+          <div className="stat-val">{isLoading ? '-' : 0}</div>
+          <div className="stat-badge badge-down">Need to generate one</div>
         </div>
       </div>
 

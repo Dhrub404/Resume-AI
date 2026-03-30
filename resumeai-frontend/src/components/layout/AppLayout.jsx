@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { api } from '../../api';
 import '../../styles/layout.css';
 
 const AppLayout = ({ title, children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.authenticatedRequest('/auth/profile/');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile", err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    navigate('/login');
+  };
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: 'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z' },
@@ -12,6 +35,8 @@ const AppLayout = ({ title, children }) => {
     { name: 'ATS Analysis', path: '/analysis', icon: 'M12 20V10M18 20V4M6 20v-4' },
     { name: 'Templates', path: '/templates', icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z' },
   ];
+
+  const userInitial = user?.first_name ? user.first_name.charAt(0).toUpperCase() : (user?.username ? user.username.charAt(0).toUpperCase() : '?');
 
   return (
     <div className="app-layout">
@@ -37,13 +62,15 @@ const AppLayout = ({ title, children }) => {
         </nav>
         <div className="sidebar-bottom">
           <div className="user-profile">
-            <div className="user-avatar">A</div>
+            <div className="user-avatar">{userInitial}</div>
             <div className="user-info">
-              <span className="user-name">Alex Johnson</span>
-              <span className="user-email">alex@example.com</span>
+              <span className="user-name">
+                {user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username : 'Loading...'}
+              </span>
+              <span className="user-email">{user?.email || ''}</span>
             </div>
           </div>
-          <div className="logout-btn" onClick={() => navigate('/login')}>
+          <div className="logout-btn" onClick={handleLogout}>
             Log Out
           </div>
         </div>
