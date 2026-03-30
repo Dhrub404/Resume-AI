@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../api';
 import '../styles/auth.css';
 
 const GoogleIcon = () => (
@@ -78,9 +79,25 @@ export default function LoginPage() {
   const [tab, setTab] = useState('login');
   const [showPwd, setShowPwd] = useState(false);
   const [strength, setStrength] = useState({ score: 0, label: 'Enter a password', cls: '' });
+  
+  // API State
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
 
+  const resetState = () => {
+    setError(null);
+    setPassword('');
+    // We intentionally keep email filled for convenience if switching tabs.
+  }
+
   const checkStrength = (val) => {
+    setPassword(val);
     if (!val) { setStrength({ score: 0, label: 'Enter a password', cls: '' }); return; }
     let score = 0;
     if (val.length >= 8) score++;
@@ -89,6 +106,36 @@ export default function LoginPage() {
     if (/[^A-Za-z0-9]/.test(val)) score++;
     const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
     setStrength({ score, label: ['', 'Weak', 'Weak', 'Good', 'Strong'][score], cls });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    try {
+      await api.login(email, password);
+      navigate('/dashboard'); // Success! Navigate directly.
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    try {
+      await api.register(firstName, lastName, email, password);
+      // Automatically log them in now that the account is created.
+      await api.login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -124,20 +171,22 @@ export default function LoginPage() {
           <div className="tab-bar">
             <button
               className={`tab-btn ${tab === 'login' ? 'active' : ''}`}
-              onClick={() => setTab('login')}
+              onClick={() => { setTab('login'); resetState(); }}
             >
               Sign In
             </button>
             <button
               className={`tab-btn ${tab === 'signup' ? 'active' : ''}`}
-              onClick={() => setTab('signup')}
+              onClick={() => { setTab('signup'); resetState(); }}
             >
               Create Account
             </button>
           </div>
 
+          {error && <div className="auth-error-message" style={{ color: '#EA4335', marginBottom: '16px', fontSize: '14px', background: '#ffe6e6', padding: '10px', borderRadius: '4px' }}>{error}</div>}
+
           {tab === 'login' && (
-            <form onSubmit={e => { e.preventDefault(); navigate('/dashboard'); }}>
+            <form onSubmit={handleLogin}>
               <div className="form-header">
                 <h2 className="form-title">Welcome back</h2>
                 <p className="form-subtitle">Sign in to access your resumes and dashboard.</p>
@@ -147,7 +196,7 @@ export default function LoginPage() {
                 <label className="form-label">Email Address</label>
                 <div className="input-wrap">
                   <span className="input-icon"><EmailIcon /></span>
-                  <input type="email" className="form-input" placeholder="you@example.com" required />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="form-input" placeholder="you@example.com" required />
                 </div>
               </div>
 
@@ -158,6 +207,8 @@ export default function LoginPage() {
                   <input
                     type={showPwd ? 'text' : 'password'}
                     className="form-input"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
                   />
@@ -175,7 +226,9 @@ export default function LoginPage() {
                 <a href="#" className="forgot-link">Forgot password?</a>
               </div>
 
-              <button type="submit" className="btn-primary">Sign In to ResumeAI</button>
+              <button type="submit" disabled={isLoading} className="btn-primary">
+                {isLoading ? "Signing In..." : "Sign In to ResumeAI"}
+              </button>
 
               <div className="divider">
                 <div className="divider-line" />
@@ -189,13 +242,13 @@ export default function LoginPage() {
 
               <p className="auth-switch">
                 Don't have an account?{' '}
-                <a href="#" onClick={e => { e.preventDefault(); setTab('signup'); }}>Sign up free</a>
+                <a href="#" onClick={e => { e.preventDefault(); setTab('signup'); resetState(); }}>Sign up free</a>
               </p>
             </form>
           )}
 
           {tab === 'signup' && (
-            <form onSubmit={e => { e.preventDefault(); navigate('/dashboard'); }}>
+            <form onSubmit={handleSignup}>
               <div className="form-header">
                 <h2 className="form-title">Create your account</h2>
                 <p className="form-subtitle">Start building a resume that stands out — free forever.</p>
@@ -206,14 +259,14 @@ export default function LoginPage() {
                   <label className="form-label">First Name</label>
                   <div className="input-wrap">
                     <span className="input-icon"><UserIcon /></span>
-                    <input type="text" className="form-input" placeholder="Alex" required />
+                    <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="form-input" placeholder="Alex" required />
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="form-label">Last Name</label>
                   <div className="input-wrap">
                     <span className="input-icon"><UserIcon /></span>
-                    <input type="text" className="form-input" placeholder="Johnson" required />
+                    <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="form-input" placeholder="Johnson" required />
                   </div>
                 </div>
               </div>
@@ -222,7 +275,7 @@ export default function LoginPage() {
                 <label className="form-label">Email Address</label>
                 <div className="input-wrap">
                   <span className="input-icon"><EmailIcon /></span>
-                  <input type="email" className="form-input" placeholder="you@example.com" required />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="form-input" placeholder="you@example.com" required />
                 </div>
               </div>
 
@@ -231,12 +284,16 @@ export default function LoginPage() {
                 <div className="input-wrap">
                   <span className="input-icon"><LockIcon /></span>
                   <input
-                    type="password"
+                    type={showPwd ? 'text' : 'password'}
                     className="form-input"
+                    value={password}
                     placeholder="Min. 8 characters"
                     onChange={e => checkStrength(e.target.value)}
                     required
                   />
+                  <button type="button" className="password-toggle" onClick={() => setShowPwd(p => !p)}>
+                    <EyeIcon />
+                  </button>
                 </div>
                 <div className="strength-bar">
                   {[0, 1, 2, 3].map(i => (
@@ -246,8 +303,8 @@ export default function LoginPage() {
                 <p className="strength-label">{strength.label}</p>
               </div>
 
-              <button type="submit" className="btn-primary" style={{ marginTop: '8px' }}>
-                Create Free Account
+              <button type="submit" disabled={isLoading} className="btn-primary" style={{ marginTop: '8px' }}>
+                {isLoading ? "Creating Account..." : "Create Free Account"}
               </button>
 
               <div className="divider">
@@ -265,7 +322,7 @@ export default function LoginPage() {
               </p>
               <p className="auth-switch" style={{ marginTop: '14px' }}>
                 Already have an account?{' '}
-                <a href="#" onClick={e => { e.preventDefault(); setTab('login'); }}>Sign in</a>
+                <a href="#" onClick={e => { e.preventDefault(); setTab('login'); resetState(); }}>Sign in</a>
               </p>
             </form>
           )}
