@@ -23,6 +23,52 @@ const initSuggestions = [
   { type:'good', typeLabel:'Strong', original:null, improved:'Your skills section has excellent keyword coverage for senior engineering roles.' },
 ];
 
+const SAMPLE_DATA = {
+  personalInfo: {
+    fullName: 'John Doe',
+    jobTitle: 'Senior Software Engineer',
+    email: 'john.doe@example.com',
+    phone: '+1 (555) 000-1234',
+    city: 'San Francisco, CA',
+    linkedin: 'johndoe',
+    portfolio: 'johndoe.dev'
+  },
+  summary: 'Results-driven Senior Software Engineer with 8+ years of experience in building scalable web applications. Proficient in React, Node.js, and cloud architecture. Proven track record of leading cross-functional teams and delivering high-impact technical solutions.',
+  experiences: [
+    {
+      jobTitle: 'Senior Software Engineer',
+      company: 'Tech Solutions Inc.',
+      startDate: 'Jan 2020',
+      endDate: 'Present',
+      current: true,
+      description: '• Led the development of a high-traffic e-commerce platform using React and Node.js.\n• Optimized database queries, reducing API latency by 40%.\n• Mentored junior developers and implemented CI/CD best practices.'
+    },
+    {
+      jobTitle: 'Software Engineer',
+      company: 'Creative Apps LLC',
+      startDate: 'Jun 2016',
+      endDate: 'Dec 2019',
+      current: false,
+      description: '• Developed and maintained multiple client-facing web applications.\n• Collaborated with designers to implement responsive and intuitive user interfaces.\n• Improved application performance by 25% through code refactor and caching strategies.'
+    }
+  ],
+  education: [
+    {
+      degree: 'B.S. in Computer Science',
+      university: 'State University',
+      startYear: '2012',
+      endYear: '2016',
+      details: 'GPA: 3.8/4.0'
+    }
+  ],
+  skills: ['React', 'JavaScript', 'TypeScript', 'Node.js', 'Python', 'AWS', 'Docker', 'SQL', 'Git'],
+  languages: [
+    { name: 'English', proficiency: 'Native / Bilingual' },
+    { name: 'Spanish', proficiency: 'Professional Working' }
+  ],
+  interests: ['Open Source', 'Photography', 'Hiking']
+};
+
 export default function ResumeBuilderPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,13 +91,13 @@ export default function ResumeBuilderPage() {
 
   // ── Style & Content States ──
   const [resumeStyle, setResumeStyle] = useState({ ...THEME_PRESETS.corporate, profileImage: null });
-  const [personalInfo, setPersonalInfo] = useState({ fullName: '', jobTitle: '', email: '', phone: '', city: '', linkedin: '', portfolio: '' });
-  const [summary, setSummary] = useState('');
-  const [experiences, setExperiences] = useState([]);
-  const [education, setEducation] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [languages, setLanguages] = useState([]);
-  const [interests, setInterests] = useState([]);
+  const [personalInfo, setPersonalInfo] = useState(SAMPLE_DATA.personalInfo);
+  const [summary, setSummary] = useState(SAMPLE_DATA.summary);
+  const [experiences, setExperiences] = useState(SAMPLE_DATA.experiences);
+  const [education, setEducation] = useState(SAMPLE_DATA.education);
+  const [skills, setSkills] = useState(SAMPLE_DATA.skills);
+  const [languages, setLanguages] = useState(SAMPLE_DATA.languages);
+  const [interests, setInterests] = useState(SAMPLE_DATA.interests);
 
   // Initialization (API fetch)
   useEffect(() => {
@@ -79,8 +125,13 @@ export default function ResumeBuilderPage() {
         } catch (err) { console.error('Failed to load format:', err); }
       } else {
         try {
+          const initialContent = { personalInfo, summary, experiences, education, skills, languages, interests, resumeStyle };
           const response = await api.authenticatedRequest('/resumes/', {
-            method: 'POST', body: JSON.stringify({ title: 'Untitled Resume', content: {} }),
+            method: 'POST', 
+            body: JSON.stringify({ 
+              title: "My New Resume", 
+              content: initialContent 
+            }),
           });
           if (response.ok) {
             const data = await response.json();
