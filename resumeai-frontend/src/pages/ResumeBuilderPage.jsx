@@ -295,7 +295,7 @@ export default function ResumeBuilderPage() {
       <div className="workspace">
         <div className="editor-panel">
           <div className="ep-tabs">
-            {['Content', 'Style', 'Settings'].map(t => (
+            {['Content', 'Style'].map(t => (
               <div key={t} className={`ep-tab ${activeTab===t?'active':''}`} onClick={() => setActiveTab(t)}>{t}</div>
             ))}
           </div>
@@ -325,8 +325,6 @@ export default function ResumeBuilderPage() {
                 handleImageUpload={handleImageUpload} 
               />
             )}
-
-            {activeTab === 'Settings' && <div style={{ padding: '2rem', color: '#94a3b8', textAlign: 'center' }}>Settings via AI API connections to be managed here.</div>}
           </div>
         </div>
 
