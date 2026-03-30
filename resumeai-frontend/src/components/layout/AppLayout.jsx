@@ -33,7 +33,6 @@ const AppLayout = ({ title, children, topbarRight }) => {
     { name: 'Dashboard', path: '/dashboard', icon: 'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z' },
     { name: 'Resume Builder', path: '/builder', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM13 3.5L18.5 9H13V3.5zM6 20V4h6v6h6v10H6z' },
     { name: 'ATS Analysis', path: '/analysis', icon: 'M12 20V10M18 20V4M6 20v-4' },
-    { name: 'Templates', path: '/templates', icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z' },
   ];
 
   const userInitial = user?.first_name ? user.first_name.charAt(0).toUpperCase() : (user?.username ? user.username.charAt(0).toUpperCase() : '?');
@@ -49,9 +48,12 @@ const AppLayout = ({ title, children, topbarRight }) => {
         <nav className="sidebar-nav">
           {navItems.map(item => (
             <div 
-              key={item.path}
-              className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-              onClick={() => navigate(item.path)}
+              key={item.name}
+              className={`nav-item ${location.pathname === item.path || (item.name === 'Resume Builder' && location.pathname === '/builder') ? 'active' : ''}`}
+              onClick={() => {
+                if (item.name === 'Resume Builder') navigate('/templates');
+                else navigate(item.path);
+              }}
             >
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d={item.icon}/>

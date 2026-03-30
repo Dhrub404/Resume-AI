@@ -130,7 +130,7 @@ export default function TemplatesPage() {
   const [activeFilter, setActiveFilter] = useState('All');
 
   return (
-    <AppLayout title="Templates">
+    <AppLayout title="Resume Builder">
       <div className="templates-header">
         <h2>Choose a Template</h2>
         <p>Pick a design that matches your style. You can switch templates anytime without losing your content.</p>
@@ -163,7 +163,7 @@ export default function TemplatesPage() {
                 ) : (
                   <>
                     <button className="tpl-preview-btn">Preview</button>
-                    <button className="tpl-use-btn" onClick={(e) => { e.stopPropagation(); setSelected(t.id); }}>Use This</button>
+                    <button className="tpl-use-btn" onClick={(e) => { e.stopPropagation(); navigate(`/builder?template=${t.id}`); }}>Use This</button>
                   </>
                 )}
               </div>
@@ -174,7 +174,7 @@ export default function TemplatesPage() {
 
       <div style={{ marginTop: 24, textAlign: 'center' }}>
         <button
-          onClick={() => navigate('/builder')}
+          onClick={() => navigate(`/builder?template=${selected}`)}
           style={{ background: 'var(--accent)', border: 'none', borderRadius: 10, color: '#fff', fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500, padding: '12px 32px', cursor: 'pointer' }}
         >
           Continue with {templates.find(t => t.id === selected)?.name} Template →

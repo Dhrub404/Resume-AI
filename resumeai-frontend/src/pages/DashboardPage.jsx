@@ -96,7 +96,7 @@ export default function DashboardPage() {
 
       <div className="section-head">
         <div className="section-title">My Resumes</div>
-        <div className="section-link" onClick={() => navigate('/builder')}>View all →</div>
+        <div className="section-link" onClick={() => navigate('/templates')}>View all →</div>
       </div>
       
       {isLoading ? (
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#f1f5f9' }}>You haven't built any resumes yet!</h3>
           <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>Let's create your first AI-optimized resume and get you hired.</p>
-          <button className="btn-primary" onClick={() => navigate('/builder')} style={{ display: 'inline-block', width: 'auto', padding: '0.8rem 1.5rem' }}>+ Create New Resume</button>
+          <button className="btn-primary" onClick={() => navigate('/templates')} style={{ display: 'inline-block', width: 'auto', padding: '0.8rem 1.5rem' }}>+ Create New Resume</button>
         </div>
       ) : (
         <div className="resumes-grid">
