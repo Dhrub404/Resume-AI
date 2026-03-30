@@ -113,7 +113,6 @@ export default function DashboardPage() {
       ) : (
         <div className="resumes-grid">
           {resumes.map(r => {
-            // Provide gentle fallbacks in case the backend schema is sparse
             const score = r.score || 0;
             const scoreClass = score > 80 ? 'score-hi' : (score > 50 ? 'score-mid' : 'score-lo');
             
