@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { staggerContainer, slideUpItem, scaleHover } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import { api } from '../api';
 import '../styles/dashboard.css';

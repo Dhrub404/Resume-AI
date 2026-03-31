@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { staggerContainer, slideUpItem, scaleHover, tapEffect } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import { api } from '../api';
 import '../styles/templates.css';
@@ -142,54 +144,77 @@ export default function TemplatesPage() {
         <p>Pick a design that matches your style. Each template creates a fresh copy — your originals are never touched.</p>
       </div>
 
-      <div className="templates-filters">
+      <motion.div className="templates-filters" variants={staggerContainer} initial="hidden" animate="show">
         {filters.map(f => (
-          <button key={f} className={`filter-btn ${activeFilter === f ? 'active' : ''}`} onClick={() => setActiveFilter(f)}>{f}</button>
+          <motion.button 
+            variants={slideUpItem}
+            whileHover={scaleHover}
+            whileTap={tapEffect}
+            key={f} 
+            className={`filter-btn ${activeFilter === f ? 'active' : ''}`} 
+            onClick={() => setActiveFilter(f)}
+          >
+            {f}
+          </motion.button>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="templates-grid">
-        {templates.filter(t => activeFilter === 'All' || t.category === activeFilter).map(t => {
-          const badgeInfo = badgeMap[t.id];
-          return (
-            <div key={t.id} className={`tpl-card ${selected === t.id ? 'selected' : ''}`} onClick={() => setSelected(t.id)}>
-              <div className="tpl-preview">
-                {thumbs[t.slug] || thumbs['modern']}
-                {badgeInfo && <div className={`tpl-badge badge-${badgeInfo.badge}`}>{badgeInfo.label}</div>}
-                {selected === t.id && (
-                  <div className="selected-check">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  </div>
-                )}
-              </div>
-              <div className="tpl-body">
-                <div className="tpl-name">{t.name}</div>
-                <div className="tpl-desc">{t.description}</div>
-                <div className="tpl-actions">
-                  {selected === t.id ? (
-                    <div className="tpl-selected-label">Selected</div>
-                  ) : (
-                    <>
-                      <button className="tpl-preview-btn">Preview</button>
-                      <button className="tpl-use-btn" disabled={loading} onClick={(e) => handleUseTemplate(t.id, e)}>Use This</button>
-                    </>
+      <motion.div className="templates-grid" layout>
+        <AnimatePresence>
+          {templates.filter(t => activeFilter === 'All' || t.category === activeFilter).map(t => {
+            const badgeInfo = badgeMap[t.id];
+            return (
+              <motion.div 
+                key={t.id} 
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                whileHover={{ y: -8, boxShadow: "0 25px 30px -5px rgba(0, 0, 0, 0.5)", scale: 1.02 }}
+                className={`tpl-card ${selected === t.id ? 'selected' : ''}`} 
+                onClick={() => setSelected(t.id)}
+              >
+                <div className="tpl-preview">
+                  {thumbs[t.slug] || thumbs['modern']}
+                  {badgeInfo && <div className={`tpl-badge badge-${badgeInfo.badge}`}>{badgeInfo.label}</div>}
+                  {selected === t.id && (
+                    <div className="selected-check">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                <div className="tpl-body">
+                  <div className="tpl-name">{t.name}</div>
+                  <div className="tpl-desc">{t.description}</div>
+                  <div className="tpl-actions">
+                    {selected === t.id ? (
+                      <div className="tpl-selected-label">Selected</div>
+                    ) : (
+                      <>
+                        <button className="tpl-preview-btn">Preview</button>
+                        <button className="tpl-use-btn" disabled={loading} onClick={(e) => handleUseTemplate(t.id, e)}>Use This</button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </motion.div>
 
       {selected && (
         <div style={{ marginTop: 24, textAlign: 'center' }}>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)" }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => handleUseTemplate(selected)}
             disabled={loading}
-            style={{ background: 'var(--accent)', border: 'none', borderRadius: 10, color: '#fff', fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500, padding: '12px 32px', cursor: 'pointer' }}
+            style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', border: 'none', borderRadius: 10, color: '#fff', fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 600, padding: '12px 32px', cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
           >
             {loading ? 'Creating...' : `Continue with ${templates.find(t => t.id === selected)?.name || ''} Template →`}
-          </button>
+          </motion.button>
         </div>
       )}
     </AppLayout>

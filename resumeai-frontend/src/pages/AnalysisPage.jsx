@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { staggerContainer, slideUpItem, scaleHover, TRANSITIONS } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import '../styles/analysis.css';
 
@@ -39,72 +41,90 @@ export default function AnalysisPage() {
     <AppLayout
       title="ATS Analysis"
       topbarRight={
-        <button
+        <motion.button
           style={{ background:'var(--accent)', border:'none', borderRadius:8, color:'#fff', fontFamily:'var(--font-body)', fontSize:13, fontWeight:500, padding:'7px 14px', cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}
           onClick={() => navigate('/builder')}
         >
           Back to Builder
-        </button>
+        </motion.button>
       }
     >
-      <div className="analysis-grid">
-        <div className="score-card">
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div className="analysis-grid">
+          <motion.div className="score-card" variants={slideUpItem} whileHover={scaleHover}>
           <div className="score-ring-wrap">
             <svg viewBox="0 0 160 160">
               <circle cx="80" cy="80" r={RADIUS} fill="none" stroke="#2A2D38" strokeWidth="10"/>
-              <circle cx="80" cy="80" r={RADIUS} fill="none" stroke="#2ECC8A" strokeWidth="10"
-                strokeDasharray={CIRC} strokeDashoffset={offset} strokeLinecap="round"/>
+              <motion.circle 
+                cx="80" cy="80" r={RADIUS} fill="none" stroke="#2ECC8A" strokeWidth="10"
+                strokeDasharray={CIRC} 
+                initial={{ strokeDashoffset: CIRC }}
+                animate={{ strokeDashoffset: offset }}
+                transition={{ duration: 1.5, ease: [0.32, 0.72, 0, 1], delay: 0.2 }}
+                strokeLinecap="round"
+              />
             </svg>
-            <div className="score-num-overlay">
+            <motion.div 
+              className="score-num-overlay"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8, ...TRANSITIONS.appleSpring }}
+            >
               <div className="score-big">{score}</div>
               <div className="score-denom">/100</div>
-            </div>
+            </motion.div>
           </div>
-          <div className="score-grade">Grade: B+</div>
+          <motion.div className="score-grade" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>Grade: B+</motion.div>
           <div className="score-detail">
             Your resume ranks in the<br/>top 25% for Software Engineer roles
           </div>
-        </div>
+        </motion.div>
 
-        <div className="breakdown-card">
+        <motion.div className="breakdown-card" variants={slideUpItem}>
           <div className="bk-title">Score Breakdown</div>
           {breakdown.map((b, i) => (
             <div className="bk-item" key={i}>
               <div className="bk-label">{b.label}</div>
               <div className="bk-bar-wrap">
-                <div className="bk-bar" style={{ width: `${b.pct}%`, background: b.color }} />
+                <motion.div 
+                  className="bk-bar" 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${b.pct}%` }}
+                  transition={{ duration: 1, delay: 0.2 + (i * 0.1), ease: [0.32, 0.72, 0, 1] }}
+                  style={{ background: b.color }} 
+                />
               </div>
-              <div className="bk-val" style={{ color: b.color }}>{b.pct}%</div>
+              <motion.div className="bk-val" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 + (i * 0.1) }} style={{ color: b.color }}>{b.pct}%</motion.div>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       <div className="keywords-row">
-        <div className="kw-card">
+        <motion.div className="kw-card" variants={slideUpItem}>
           <div className="kw-head" style={{ color: 'var(--success)' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
             Keywords Found ({foundKw.length})
           </div>
-          <div className="kw-tags">
-            {foundKw.map(k => <span className="kw-tag kw-found" key={k}>{k}</span>)}
-          </div>
-        </div>
-        <div className="kw-card">
+          <motion.div className="kw-tags" variants={staggerContainer} initial="hidden" animate="show">
+            {foundKw.map(k => <motion.span variants={slideUpItem} whileHover={{ scale: 1.05 }} className="kw-tag kw-found" key={k}>{k}</motion.span>)}
+          </motion.div>
+        </motion.div>
+        <motion.div className="kw-card" variants={slideUpItem}>
           <div className="kw-head" style={{ color: 'var(--danger)' }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             Missing Keywords ({missKw.length})
           </div>
-          <div className="kw-tags">
-            {missKw.map(k => <span className="kw-tag kw-miss" key={k}>{k}</span>)}
-          </div>
-        </div>
+          <motion.div className="kw-tags" variants={staggerContainer} initial="hidden" animate="show">
+            {missKw.map(k => <motion.span variants={slideUpItem} whileHover={{ scale: 1.05 }} className="kw-tag kw-miss" key={k}>{k}</motion.span>)}
+          </motion.div>
+        </motion.div>
       </div>
 
-      <div className="suggestions-section">
+      <motion.div className="suggestions-section" variants={slideUpItem}>
         <div className="sug-section-title">Improvement Suggestions</div>
         {suggestions.map((s, i) => (
-          <div className="sug-row" key={i}>
+          <motion.div className="sug-row" key={i} whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.02)" }}>
             <div className="sug-row-icon" style={{ background: s.bg }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={s.stroke} strokeWidth="2.2" strokeLinecap="round">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -115,20 +135,28 @@ export default function AnalysisPage() {
               <span>{s.desc}</span>
             </div>
             <div className={`impact-badge ${s.impactCls}`}>{s.impact}</div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="history-card">
+      <motion.div className="history-card" variants={slideUpItem}>
         <div className="history-head">Score History</div>
         {history.map((h, i) => (
           <div className="hist-row" key={i}>
             <div className="hist-date">{h.date}</div>
-            <div className="hist-bar-wrap"><div className="hist-bar" style={{ width: `${h.val}%` }} /></div>
+            <div className="hist-bar-wrap">
+              <motion.div 
+                className="hist-bar" 
+                initial={{ width: 0 }}
+                animate={{ width: `${h.val}%` }}
+                transition={{ duration: 1, delay: 0.5 + (i * 0.1), ease: [0.32, 0.72, 0, 1] }}
+              />
+            </div>
             <div className="hist-val" style={{ color: h.val >= 80 ? 'var(--success)' : h.val >= 70 ? 'var(--warning)' : 'var(--danger)' }}>{h.val}</div>
           </div>
         ))}
-      </div>
+      </motion.div>
+      </motion.div>
     </AppLayout>
   );
 }
