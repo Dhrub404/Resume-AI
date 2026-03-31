@@ -67,6 +67,7 @@
   margin-bottom: 1rem;
   background: linear-gradient(to right, #fff, #94a3b8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -423,4 +424,49 @@
   .auth-sidebar {
     display: none;
   }
+}
+
+/* ════════ LIGHT THEME SPECIFIC OVERRIDES ════════ */
+[data-theme="light"] .auth-sidebar {
+  border-right-color: rgba(0, 0, 0, 0.05); /* Softer border */
+}
+
+/* 1. Headline visibility: Using a darker gradient for light mode */
+[data-theme="light"] .sidebar-headline {
+  background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 2. Logo and subtext clarity */
+[data-theme="light"] .logo-text {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .logo-text span {
+  color: var(--accent);
+}
+
+[data-theme="light"] .sidebar-sub {
+  color: var(--text-secondary);
+}
+
+/* 3. Feature visibility */
+[data-theme="light"] .feature-info p {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .feature-info span {
+  color: var(--text-muted);
+}
+
+/* 4. Footer visibility */
+[data-theme="light"] .sidebar-footer {
+  color: var(--text-muted); /* More readable than faint in light mode */
+}
+
+/* 5. Subtle background polish */
+[data-theme="light"] .auth-sidebar::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
 }
