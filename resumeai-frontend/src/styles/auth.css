@@ -65,7 +65,7 @@
 }
 
 [data-theme="light"] .auth-sidebar .logo-text {
-  color: #ffffff; /* We keep it white on the sidebar as the sidebar background remains dark-ish even in light mode for contrast */
+  color: #ffffff;
 }
 
 .auth-sidebar .logo-text span { color: #8b5cf6; }
@@ -154,12 +154,6 @@
   mask-image: radial-gradient(circle at center, black, transparent 80%);
   opacity: 0.4;
   pointer-events: none;
-}
-
-[data-theme="light"] .grid-bg {
-  background-image: 
-    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
 }
 
 .auth-card {
