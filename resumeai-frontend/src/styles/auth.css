@@ -34,6 +34,10 @@
   background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent 70%);
 }
 
+[data-theme="light"] .auth-sidebar::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+}
+
 .auth-sidebar .logo {
   display: flex;
   align-items: center;
@@ -56,6 +60,12 @@
 .auth-sidebar .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #ffffff; /* Explicitly white for dark mode sidebar */
+}
+
+[data-theme="light"] .auth-sidebar .logo-text {
+  color: #ffffff; /* We keep it white on the sidebar as the sidebar background remains dark-ish even in light mode for contrast */
 }
 
 .auth-sidebar .logo-text span { color: #8b5cf6; }
@@ -64,9 +74,9 @@
   font-size: 2.25rem;
   font-weight: 800;
   line-height: 1.2;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   z-index: 10;
-  background: linear-gradient(to right, #fff, #94a3b8);
+  background: linear-gradient(to right, #ffffff, #94a3b8);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -144,6 +154,12 @@
   mask-image: radial-gradient(circle at center, black, transparent 80%);
   opacity: 0.4;
   pointer-events: none;
+}
+
+[data-theme="light"] .grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
 }
 
 .auth-card {
