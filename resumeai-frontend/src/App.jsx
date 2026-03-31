@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { UserProvider } from './context/UserContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ResumeBuilderPage from './pages/ResumeBuilderPage';
@@ -9,15 +10,17 @@ import ProfilePage from './pages/ProfilePage';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/builder" element={<ResumeBuilderPage />} />
-        <Route path="/analysis" element={<AnalysisPage />} />
-        <Route path="/templates" element={<TemplatesPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/builder" element={<ResumeBuilderPage />} />
+          <Route path="/analysis" element={<AnalysisPage />} />
+          <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
+      </UserProvider>
     </BrowserRouter>
   );
 }

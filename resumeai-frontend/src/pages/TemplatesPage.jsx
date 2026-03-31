@@ -5,7 +5,7 @@ import '../styles/templates.css';
 
 const templates = [
   {
-    id: 1, name: 'Modern', desc: 'Clean with blue accents', badge: 'popular', badgeLabel: 'Popular',
+    id: 1, name: 'Modern', desc: 'Clean with blue accents', badge: 'popular', badgeLabel: 'Popular', category: 'Professional',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'8px 7px' }}>
         <div style={{ width:16, height:16, borderRadius:'50%', background:'#e2e8f0', marginBottom:5 }} />
@@ -19,7 +19,7 @@ const templates = [
     ),
   },
   {
-    id: 2, name: 'Classic', desc: 'Traditional & timeless', badge: null,
+    id: 2, name: 'Classic', desc: 'Traditional & timeless', badge: null, category: 'Professional',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'8px 7px' }}>
         <div style={{ height:5, background:'#1e293b', borderRadius:1, marginBottom:4, width:'80%' }} />
@@ -33,7 +33,7 @@ const templates = [
     ),
   },
   {
-    id: 3, name: 'Executive', desc: 'Two-column bold layout', badge: 'new', badgeLabel: 'New',
+    id: 3, name: 'Executive', desc: 'Two-column bold layout', badge: 'new', badgeLabel: 'New', category: 'Two-Column',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'6px', display:'grid', gridTemplateColumns:'1fr 2fr', gap:4 }}>
         <div style={{ background:'#1e293b', borderRadius:2, padding:5 }}>
@@ -51,7 +51,7 @@ const templates = [
     ),
   },
   {
-    id: 4, name: 'Creative', desc: 'Bold green accents', badge: null,
+    id: 4, name: 'Creative', desc: 'Bold green accents', badge: null, category: 'Creative',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'8px 7px' }}>
         <div style={{ height:5, background:'#059669', borderRadius:1, marginBottom:4, width:'85%' }} />
@@ -64,7 +64,7 @@ const templates = [
     ),
   },
   {
-    id: 5, name: 'Minimal', desc: 'Ultra clean, no color', badge: null,
+    id: 5, name: 'Minimal', desc: 'Ultra clean, no color', badge: null, category: 'Minimal',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'8px 7px' }}>
         <div style={{ height:5, background:'#334155', borderRadius:1, marginBottom:3, width:'75%' }} />
@@ -77,7 +77,7 @@ const templates = [
     ),
   },
   {
-    id: 6, name: 'Tech', desc: 'Dark sidebar, modern', badge: 'new', badgeLabel: 'New',
+    id: 6, name: 'Tech', desc: 'Dark sidebar, modern', badge: 'new', badgeLabel: 'New', category: 'Two-Column',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'6px', display:'grid', gridTemplateColumns:'20px 1fr', gap:4 }}>
         <div style={{ background:'#1e293b', borderRadius:2, padding:'6px 3px', display:'flex', flexDirection:'column', gap:3, alignItems:'center' }}>
@@ -96,7 +96,7 @@ const templates = [
     ),
   },
   {
-    id: 7, name: 'Elegant', desc: 'Serif fonts, classic feel', badge: null,
+    id: 7, name: 'Elegant', desc: 'Serif fonts, classic feel', badge: null, category: 'Professional',
     thumb: (
       <div style={{ width:75, background:'#fffbf7', borderRadius:3, padding:'8px 7px', border:'1px solid #f0e6d3' }}>
         <div style={{ height:5, background:'#92400e', borderRadius:1, marginBottom:4, width:'80%' }} />
@@ -108,7 +108,7 @@ const templates = [
     ),
   },
   {
-    id: 8, name: 'Compact', desc: 'Fits more in one page', badge: null,
+    id: 8, name: 'Compact', desc: 'Fits more in one page', badge: null, category: 'Minimal',
     thumb: (
       <div style={{ width:75, background:'#fff', borderRadius:3, padding:'6px 7px' }}>
         <div style={{ height:4, background:'#1e293b', borderRadius:1, marginBottom:2, width:'70%' }} />
@@ -143,7 +143,7 @@ export default function TemplatesPage() {
       </div>
 
       <div className="templates-grid">
-        {templates.map(t => (
+        {templates.filter(t => activeFilter === 'All' || t.category === activeFilter).map(t => (
           <div key={t.id} className={`tpl-card ${selected === t.id ? 'selected' : ''}`} onClick={() => setSelected(t.id)}>
             <div className="tpl-preview">
               {t.thumb}

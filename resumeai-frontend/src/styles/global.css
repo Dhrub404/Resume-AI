@@ -1,6 +1,16 @@
 /* global.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --font-body: 'Inter', sans-serif;
+  --bg-dark: #0f172a;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
+import { useUser } from '../context/UserContext';
 import { api } from '../api';
 import '../styles/profile.css';
 
@@ -28,16 +29,31 @@ const getPasswordStrength = (pw) => {
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const { user: contextUser, updateUser } = useUser();
   
-  // ── User State ──
-  const [user, setUser] = useState({
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
+  // ── Build display name from context ──
+  const contextName = contextUser
+    ? (`${contextUser.first_name || ''} ${contextUser.last_name || ''}`.trim() || contextUser.username || contextUser.email || 'User')
+    : 'User';
+
+  // ── Local Profile State ──
+  const [profileData, setProfileData] = useState({
+    name: contextName,
+    email: contextUser?.email || 'user@example.com',
     phone: '+91 9876543210',
     location: 'Bangalore, India',
     avatar: '',
   });
   
+  // Sync context → local state when context updates
+  useEffect(() => {
+    if (contextUser) {
+      const name = `${contextUser.first_name || ''} ${contextUser.last_name || ''}`.trim() || contextUser.username || contextUser.email || 'User';
+      setProfileData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
+      setFormData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
+    }
+  }, [contextUser]);
+
   const [settings, setSettings] = useState({
     emailNotifications: true,
     weeklyDigest: false,
@@ -53,7 +69,7 @@ export default function ProfilePage() {
 
   // ── Edit Mode ──
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
+  const [formData, setFormData] = useState({ ...profileData });
   
   // ── Password State ──
   const [passwords, setPasswords] = useState({ current: '', newPw: '', confirm: '' });
@@ -66,19 +82,9 @@ export default function ProfilePage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // ── Fetch real user data ──
+  // ── Fetch resume stats ──
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const profileResp = await api.authenticatedRequest('/auth/profile/');
-        if (profileResp.ok) {
-          const data = await profileResp.json();
-          const fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.username;
-          setUser(prev => ({ ...prev, name: fullName, email: data.email || prev.email }));
-          setFormData(prev => ({ ...prev, name: fullName, email: data.email || prev.email }));
-        }
-      } catch (err) { console.error('Profile fetch error:', err); }
-
+    const fetchStats = async () => {
       try {
         const resumeResp = await api.authenticatedRequest('/resumes/');
         if (resumeResp.ok) {
@@ -87,21 +93,30 @@ export default function ProfilePage() {
           const bestScore = resumes.length > 0 ? Math.max(...resumes.map(r => r.score || 0)) : 0;
           setStats({ resumes: resumes.length, atsScore: bestScore, downloads: 0 });
         }
-      } catch (err) { console.error('Resumes fetch error:', err); }
+      } catch (err) { console.error('Stats fetch error:', err); }
     };
-    fetchData();
+    fetchStats();
   }, []);
 
   // ── Handlers ──
   const handleEditToggle = () => {
     if (editMode) {
-      setFormData({ ...user }); // reset
+      setFormData({ ...profileData });
     }
     setEditMode(!editMode);
   };
 
   const handleSaveProfile = () => {
-    setUser({ ...formData });
+    setProfileData({ ...formData });
+    // Sync back to shared context so sidebar updates instantly
+    const nameParts = formData.name.split(' ');
+    updateUser({ 
+      ...contextUser, 
+      first_name: nameParts[0] || '', 
+      last_name: nameParts.slice(1).join(' ') || '', 
+      email: formData.email,
+      username: contextUser?.username || formData.email 
+    });
     setEditMode(false);
     showToast('Profile updated successfully!');
   };
@@ -111,7 +126,7 @@ export default function ProfilePage() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUser(prev => ({ ...prev, avatar: reader.result }));
+        setProfileData(prev => ({ ...prev, avatar: reader.result }));
         setFormData(prev => ({ ...prev, avatar: reader.result }));
       };
       reader.readAsDataURL(file);
@@ -131,7 +146,7 @@ export default function ProfilePage() {
   };
 
   const pwStrength = getPasswordStrength(passwords.newPw);
-  const userInitial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+  const userInitial = profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U';
 
   return (
     <AppLayout title="Profile & Settings">
@@ -149,7 +164,7 @@ export default function ProfilePage() {
         <div className="profile-header-card">
           <div className="profile-avatar-wrap">
             <div className="profile-avatar">
-              {user.avatar ? <img src={user.avatar} alt="Avatar" /> : userInitial}
+              {profileData.avatar ? <img src={profileData.avatar} alt="Avatar" /> : userInitial}
             </div>
             <label className="avatar-upload-overlay" htmlFor="avatar-upload">
               <IconCamera />
@@ -157,8 +172,8 @@ export default function ProfilePage() {
             <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
           </div>
           <div className="profile-header-info">
-            <div className="profile-name">{user.name}</div>
-            <div className="profile-email">{user.email}</div>
+            <div className="profile-name">{profileData.name}</div>
+            <div className="profile-email">{profileData.email}</div>
             <div className="profile-member-since"><IconCalendar /> Member since March 2026</div>
           </div>
           <button className="profile-edit-btn" onClick={handleEditToggle}>

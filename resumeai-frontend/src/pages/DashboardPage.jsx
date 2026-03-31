@@ -108,7 +108,7 @@ export default function DashboardPage() {
         }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#f1f5f9' }}>You haven't built any resumes yet!</h3>
           <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>Let's create your first AI-optimized resume and get you hired.</p>
-          <button className="btn-primary" onClick={() => navigate('/templates')} style={{ display: 'inline-block', width: 'auto', padding: '0.8rem 1.5rem' }}>+ Create New Resume</button>
+          <button onClick={() => navigate('/templates')} style={{ display: 'inline-block', width: 'auto', padding: '0.8rem 1.5rem', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ Create New Resume</button>
         </div>
       ) : (
         <div className="resumes-grid">
@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="rc-body">
                   <div className="rc-name">{r.title || 'Untitled Resume'}</div>
-                  <div className="rc-meta">Last edited recently</div>
+                  <div className="rc-meta">Edited {r.updated_at ? new Date(r.updated_at).toLocaleDateString() : 'recently'}</div>
                 </div>
                 <div className="rc-foot">
                   <span className="rc-tag">Modern</span>

@@ -206,9 +206,11 @@ export default function ResumeBuilderPage() {
     }
   };
 
-  // ── Missing Features (Star & Percentage Styling) ──
+  // ── Skill Visualization ──
   const renderSkill = (skill, i) => {
-    const w = Math.floor(Math.random() * 30 + 70); // Mock score 70-100%
+    // Deterministic score based on skill name (no random flickering)
+    const hash = skill.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const w = 70 + (hash % 31); // 70-100%
     const cColor = resumeStyle.skillColor || resumeStyle.primaryColor;
 
     if(resumeStyle.skillStyle === 'progress') {

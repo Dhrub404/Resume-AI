@@ -114,7 +114,9 @@ export default function LoginPage() {
     setError(null);
     try {
       await api.login(email, password);
-      navigate('/dashboard'); // Success! Navigate directly.
+      // Save user info for sidebar display
+      localStorage.setItem('user_profile', JSON.stringify({ username: email, email, first_name: '', last_name: '' }));
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -128,8 +130,9 @@ export default function LoginPage() {
     setError(null);
     try {
       await api.register(firstName, lastName, email, password);
-      // Automatically log them in now that the account is created.
       await api.login(email, password);
+      // Save user info for sidebar display
+      localStorage.setItem('user_profile', JSON.stringify({ username: email, email, first_name: firstName, last_name: lastName }));
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

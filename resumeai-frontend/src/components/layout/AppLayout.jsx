@@ -1,42 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { api } from '../../api';
+import { useUser } from '../../context/UserContext';
 import '../../styles/layout.css';
 
 const AppLayout = ({ title, children, topbarRight }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await api.authenticatedRequest('/auth/profile/');
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user profile", err);
-      }
-    };
-    fetchProfile();
-  }, []);
+  const { user, clearUser } = useUser();
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    clearUser();
     navigate('/login');
   };
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: 'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z' },
     { name: 'Resume Builder', path: '/builder', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM13 3.5L18.5 9H13V3.5zM6 20V4h6v6h6v10H6z' },
-    { name: 'ATS Analysis', path: '/analysis', icon: 'M12 20V10M18 20V4M6 20v-4' },
-    { name: 'Profile', path: '/profile', icon: 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 110 8 4 4 0 010-8z' },
+    { name: 'ATS Analysis', path: '/analysis', icon: 'M5 20h2V10H5v10zm6 0h2V4h-2v16zm6 0h2v-8h-2v8z' },
   ];
 
-  const userInitial = user?.first_name ? user.first_name.charAt(0).toUpperCase() : (user?.username ? user.username.charAt(0).toUpperCase() : '?');
+  // Build display name with multiple fallbacks — NEVER shows "Loading..."
+  const displayName = user
+    ? (`${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || user.email || 'User')
+    : 'User';
+  
+  const displayEmail = user?.email || '';
+  const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="app-layout">
@@ -67,10 +58,8 @@ const AppLayout = ({ title, children, topbarRight }) => {
           <div className="user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
             <div className="user-avatar">{userInitial}</div>
             <div className="user-info">
-              <span className="user-name">
-                {user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username : 'Loading...'}
-              </span>
-              <span className="user-email">{user?.email || ''}</span>
+              <span className="user-name">{displayName}</span>
+              <span className="user-email">{displayEmail}</span>
             </div>
           </div>
           <div className="logout-btn" onClick={handleLogout}>
