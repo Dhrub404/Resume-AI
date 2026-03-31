@@ -4,6 +4,7 @@ import DashboardPage from './pages/DashboardPage';
 import ResumeBuilderPage from './pages/ResumeBuilderPage';
 import AnalysisPage from './pages/AnalysisPage';
 import TemplatesPage from './pages/TemplatesPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/builder" element={<ResumeBuilderPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/templates" element={<TemplatesPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );
