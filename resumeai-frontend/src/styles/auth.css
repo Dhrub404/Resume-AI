@@ -32,6 +32,10 @@
   pointer-events: none;
 }
 
+[data-theme="light"] .auth-sidebar::before {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -54,6 +58,11 @@
   font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: -0.5px;
+  color: #ffffff; /* Explicitly white for dark mode sidebar */
+}
+
+[data-theme="light"] .logo-text {
+  color: #0f172a; /* Dark for light mode sidebar */
 }
 
 .logo-text span {
@@ -65,9 +74,16 @@
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 1rem;
-  background: linear-gradient(to right, #fff, #94a3b8);
+  background: linear-gradient(to right, #ffffff, #94a3b8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .sidebar-headline {
+  background: linear-gradient(to right, #0f172a, #334155);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .sidebar-sub {
@@ -141,6 +157,12 @@
     linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
+}
+
+[data-theme="light"] .grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
 }
 
 .auth-card {
