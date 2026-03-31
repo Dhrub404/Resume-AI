@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { staggerContainer, slideUpItem, scaleHover } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import { api } from '../api';
 import '../styles/dashboard.css';
@@ -69,30 +71,30 @@ export default function DashboardPage() {
   
   return (
     <AppLayout title="Dashboard">
-      <div className="stats-row">
-        <div className="stat-card">
+      <motion.div className="stats-row" variants={staggerContainer} initial="hidden" animate="show">
+        <motion.div className="stat-card" variants={slideUpItem} whileHover={scaleHover}>
           <div className="stat-label">Total Resumes</div>
-          <div className="stat-val">{isLoading ? '-' : resumes.length}</div>
+          <div className="stat-val">{isLoading ? <div className="skeleton-box" style={{width: 40, height: 40, margin: '0 0 0.5rem'}} /> : Math.max(resumes.length, 0)}</div>
           <div className="stat-badge badge-up">Active count</div>
-        </div>
-        <div className="stat-card">
+        </motion.div>
+        <motion.div className="stat-card" variants={slideUpItem} whileHover={scaleHover}>
           <div className="stat-label">Best ATS Score</div>
           <div className="stat-val" style={{ color: bestScore > 75 ? 'var(--success)' : 'var(--warning)' }}>
-            {isLoading ? '-' : bestScore}
+            {isLoading ? <div className="skeleton-box" style={{width: 50, height: 40, margin: '0 0 0.5rem'}} /> : bestScore}
           </div>
           <div className="stat-badge badge-up">Across all resumes</div>
-        </div>
-        <div className="stat-card">
+        </motion.div>
+        <motion.div className="stat-card" variants={slideUpItem} whileHover={scaleHover}>
           <div className="stat-label">AI Suggestions Used</div>
-          <div className="stat-val">{isLoading ? '-' : aiTipsUsed}</div>
+          <div className="stat-val">{isLoading ? <div className="skeleton-box" style={{width: 30, height: 40, margin: '0 0 0.5rem'}} /> : aiTipsUsed}</div>
           <div className="stat-badge badge-up">Since you joined</div>
-        </div>
-        <div className="stat-card">
+        </motion.div>
+        <motion.div className="stat-card" variants={slideUpItem} whileHover={scaleHover}>
           <div className="stat-label">PDF Downloads</div>
-          <div className="stat-val">{isLoading ? '-' : 0}</div>
+          <div className="stat-val">{isLoading ? <div className="skeleton-box" style={{width: 30, height: 40, margin: '0 0 0.5rem'}} /> : 0}</div>
           <div className="stat-badge badge-down">Need to generate one</div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <div className="section-head">
         <div className="section-title">My Resumes</div>
@@ -100,7 +102,11 @@ export default function DashboardPage() {
       </div>
       
       {isLoading ? (
-        <div style={{ color: '#94a3b8', padding: '2rem 0', textAlign: 'center' }}>Loading your professional resumes...</div>
+        <motion.div className="resumes-grid" variants={staggerContainer} initial="hidden" animate="show">
+          {[1,2,3].map(i => (
+            <motion.div className="resume-card skeleton-box" style={{ height: 260, border: 'none', background: 'rgba(255,255,255,0.02)' }} key={i} variants={slideUpItem} />
+          ))}
+        </motion.div>
       ) : resumes.length === 0 ? (
         <div className="empty-state" style={{ 
           background: 'rgba(30, 41, 59, 0.5)', borderRadius: '16px', padding: '3rem 2rem', 
@@ -111,13 +117,19 @@ export default function DashboardPage() {
           <button onClick={() => navigate('/templates')} style={{ display: 'inline-block', width: 'auto', padding: '0.8rem 1.5rem', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ Create New Resume</button>
         </div>
       ) : (
-        <div className="resumes-grid">
+        <motion.div className="resumes-grid" variants={staggerContainer} initial="hidden" animate="show">
           {resumes.map(r => {
             const score = r.score || 0;
             const scoreClass = score > 80 ? 'score-hi' : (score > 50 ? 'score-mid' : 'score-lo');
             
             return (
-              <div className="resume-card" key={r.id} onClick={() => navigate(`/builder?id=${r.id}`)}>
+              <motion.div 
+                className="resume-card" 
+                key={r.id} 
+                onClick={() => navigate(`/builder?id=${r.id}`)}
+                variants={slideUpItem}
+                whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.4)", borderColor: "rgba(59, 130, 246, 0.3)" }}
+              >
                 <div className="rc-preview">
                   <ResumeThumb />
                   <div className="rc-badge-wrap">
@@ -132,14 +144,14 @@ export default function DashboardPage() {
                   <span className="rc-tag">Modern</span>
                   <span className="rc-date">{new Date(r.created_at || Date.now()).toLocaleDateString()}</span>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       )}
 
-      <div className="bottom-row">
-        <div className="activity-card">
+      <motion.div className="bottom-row" variants={staggerContainer} initial="hidden" animate="show">
+        <motion.div className="activity-card" variants={slideUpItem}>
           <div className="section-head">
             <div className="section-title">Recent Activity</div>
           </div>
@@ -150,8 +162,8 @@ export default function DashboardPage() {
               <div className="act-time">{a.time}</div>
             </div>
           ))}
-        </div>
-        <div className="tips-card">
+        </motion.div>
+        <motion.div className="tips-card" variants={slideUpItem}>
           <div className="section-head">
             <div className="section-title">Improvement Tips</div>
           </div>
@@ -164,8 +176,8 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </AppLayout>
   );
 }
