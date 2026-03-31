@@ -29,26 +29,27 @@ const getPasswordStrength = (pw) => {
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user: contextUser, updateUser } = useUser();
+  const { user: contextUser, isLoaded, updateUser } = useUser();
   
-  // ── Build display name from context ──
-  const contextName = contextUser
-    ? (`${contextUser.first_name || ''} ${contextUser.last_name || ''}`.trim() || contextUser.username || contextUser.email || 'User')
-    : 'User';
+  // ── Build display name dynamically from context ──
+  const getName = (u) => {
+    if (!u) return '';
+    return (`${u.first_name || ''} ${u.last_name || ''}`.trim() || u.username || u.email || '');
+  };
 
-  // ── Local Profile State ──
+  // ── Local Profile State — initialized empty, populated by useEffect ──
   const [profileData, setProfileData] = useState({
-    name: contextName,
-    email: contextUser?.email || 'user@example.com',
-    phone: '+91 9876543210',
-    location: 'Bangalore, India',
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
     avatar: '',
   });
   
-  // Sync context → local state when context updates
+  // Sync context → local state whenever context user updates
   useEffect(() => {
     if (contextUser) {
-      const name = `${contextUser.first_name || ''} ${contextUser.last_name || ''}`.trim() || contextUser.username || contextUser.email || 'User';
+      const name = getName(contextUser);
       setProfileData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
       setFormData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
     }
@@ -176,7 +177,18 @@ export default function ProfilePage() {
   };
 
   const pwStrength = getPasswordStrength(passwords.newPw);
-  const userInitial = profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U';
+  const userInitial = profileData.name ? profileData.name.charAt(0).toUpperCase() : '?';
+
+  // Wait until user data is loaded before rendering
+  if (!isLoaded || !profileData.name) {
+    return (
+      <AppLayout title="Profile & Settings">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', color: 'var(--text-muted)', fontSize: 15 }}>
+          Loading profile...
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout title="Profile & Settings">
@@ -204,7 +216,7 @@ export default function ProfilePage() {
           <div className="profile-header-info">
             <div className="profile-name">{profileData.name}</div>
             <div className="profile-email">{profileData.email}</div>
-            <div className="profile-member-since"><IconCalendar /> Member since March 2026</div>
+            <div className="profile-member-since"><IconCalendar /> Member since {contextUser?.date_joined ? new Date(contextUser.date_joined).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—'}</div>
           </div>
           <button className="profile-edit-btn" onClick={handleEditToggle}>
             <IconEdit /> {editMode ? 'Cancel Editing' : 'Edit Profile'}

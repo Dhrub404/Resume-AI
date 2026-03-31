@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
+import { useUser } from '../context/UserContext';
 import '../styles/auth.css';
 
 const GoogleIcon = () => (
@@ -89,6 +90,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { updateUser } = useUser();
 
   const resetState = () => {
     setError(null);
@@ -114,11 +116,11 @@ export default function LoginPage() {
     setError(null);
     try {
       await api.login(email, password);
-      // Fetch real profile from backend so sidebar shows actual name
+      // Fetch real profile and push into UserContext so sidebar updates instantly
       const profileResp = await api.authenticatedRequest('/auth/profile/');
       if (profileResp.ok) {
-        const profileData = await profileResp.json();
-        localStorage.setItem('user_profile', JSON.stringify(profileData));
+        const data = await profileResp.json();
+        updateUser(data);
       }
       navigate('/dashboard');
     } catch (err) {
@@ -135,11 +137,11 @@ export default function LoginPage() {
     try {
       await api.register(firstName, lastName, email, password);
       await api.login(email, password);
-      // Fetch real profile from backend
+      // Fetch real profile and push into UserContext so sidebar updates instantly
       const profileResp = await api.authenticatedRequest('/auth/profile/');
       if (profileResp.ok) {
-        const profileData = await profileResp.json();
-        localStorage.setItem('user_profile', JSON.stringify(profileData));
+        const data = await profileResp.json();
+        updateUser(data);
       }
       navigate('/dashboard');
     } catch (err) {
