@@ -9,7 +9,7 @@ class TemplateSerializer(serializers.ModelSerializer):
 class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resume
-        fields = ('id', 'title', 'template', 'content', 'created_at', 'updated_at')
+        fields = ('id', 'title', 'template', 'content', 'score', 'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
 
     def create(self, validated_data):
