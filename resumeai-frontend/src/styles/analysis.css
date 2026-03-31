@@ -8,8 +8,8 @@
 }
 
 .score-card, .breakdown-card, .kw-card, .suggestions-section, .history-card {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 1.5rem;
   backdrop-filter: blur(10px);
@@ -54,13 +54,13 @@
 .score-big {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .score-denom {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .score-grade {
@@ -72,14 +72,14 @@
 
 .score-detail {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.4;
 }
 
 .bk-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin-bottom: 1.2rem;
 }
 
@@ -92,13 +92,13 @@
 .bk-label {
   width: 160px;
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .bk-bar-wrap {
   flex: 1;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
   border-radius: 3px;
   overflow: hidden;
   margin: 0 1rem;
@@ -134,6 +134,7 @@
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .kw-tags {
@@ -169,18 +170,18 @@
 .sug-section-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin-bottom: 1.2rem;
 }
 
 .sug-row {
   display: flex;
   align-items: flex-start;
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--bg-hover);
   padding: 1.25rem;
   border-radius: 12px;
   margin-bottom: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
 }
 
 .sug-row-icon {
@@ -202,12 +203,12 @@
   margin: 0 0 0.3rem 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 
 .sug-row-content span {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.4;
 }
 
@@ -229,7 +230,7 @@
 .history-head {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
   margin-bottom: 1.2rem;
 }
 
@@ -242,13 +243,13 @@
 .hist-date {
   width: 80px;
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .hist-bar-wrap {
   flex: 1;
   height: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-active);
   border-radius: 4px;
   margin: 0 1rem;
   overflow: hidden;
@@ -256,7 +257,7 @@
 
 .hist-bar {
   height: 100%;
-  background: #3b82f6;
+  background: var(--accent);
   border-radius: 4px;
 }
 
@@ -265,4 +266,5 @@
   text-align: right;
   font-size: 0.85rem;
   font-weight: 700;
+  color: var(--text-primary);
 }
