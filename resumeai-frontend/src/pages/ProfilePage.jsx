@@ -106,19 +106,31 @@ export default function ProfilePage() {
     setEditMode(!editMode);
   };
 
-  const handleSaveProfile = () => {
-    setProfileData({ ...formData });
-    // Sync back to shared context so sidebar updates instantly
+  const handleSaveProfile = async () => {
     const nameParts = formData.name.split(' ');
-    updateUser({ 
-      ...contextUser, 
-      first_name: nameParts[0] || '', 
-      last_name: nameParts.slice(1).join(' ') || '', 
+    const payload = {
+      first_name: nameParts[0] || '',
+      last_name: nameParts.slice(1).join(' ') || '',
       email: formData.email,
-      username: contextUser?.username || formData.email 
-    });
-    setEditMode(false);
-    showToast('Profile updated successfully!');
+    };
+    try {
+      const response = await api.authenticatedRequest('/auth/profile/', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setProfileData({ ...formData });
+        updateUser(updatedUser);
+        setEditMode(false);
+        showToast('Profile updated successfully!');
+      } else {
+        const err = await response.json();
+        showToast(Object.values(err).flat().join(', ') || 'Failed to save.', 'error');
+      }
+    } catch (err) {
+      showToast('Network error. Please try again.', 'error');
+    }
   };
 
   const handleAvatarUpload = (e) => {
@@ -133,15 +145,33 @@ export default function ProfilePage() {
     }
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     const errors = {};
     if (!passwords.current) errors.current = 'Current password is required';
     if (passwords.newPw.length < 8) errors.newPw = 'Password must be at least 8 characters';
     if (passwords.newPw !== passwords.confirm) errors.confirm = 'Passwords do not match';
     setPwErrors(errors);
-    if (Object.keys(errors).length === 0) {
-      setPasswords({ current: '', newPw: '', confirm: '' });
-      showToast('Password changed successfully!');
+    if (Object.keys(errors).length > 0) return;
+
+    try {
+      const response = await api.authenticatedRequest('/auth/change-password/', {
+        method: 'POST',
+        body: JSON.stringify({
+          current_password: passwords.current,
+          new_password: passwords.newPw,
+        }),
+      });
+      if (response.ok) {
+        setPasswords({ current: '', newPw: '', confirm: '' });
+        showToast('Password changed successfully!');
+      } else {
+        const err = await response.json();
+        const msg = err.current_password?.[0] || err.new_password?.[0] || 'Failed to change password.';
+        setPwErrors({ current: err.current_password?.[0] || '', newPw: err.new_password?.[0] || '' });
+        showToast(msg, 'error');
+      }
+    } catch (err) {
+      showToast('Network error. Please try again.', 'error');
     }
   };
 

@@ -114,8 +114,12 @@ export default function LoginPage() {
     setError(null);
     try {
       await api.login(email, password);
-      // Save user info for sidebar display
-      localStorage.setItem('user_profile', JSON.stringify({ username: email, email, first_name: '', last_name: '' }));
+      // Fetch real profile from backend so sidebar shows actual name
+      const profileResp = await api.authenticatedRequest('/auth/profile/');
+      if (profileResp.ok) {
+        const profileData = await profileResp.json();
+        localStorage.setItem('user_profile', JSON.stringify(profileData));
+      }
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -131,8 +135,12 @@ export default function LoginPage() {
     try {
       await api.register(firstName, lastName, email, password);
       await api.login(email, password);
-      // Save user info for sidebar display
-      localStorage.setItem('user_profile', JSON.stringify({ username: email, email, first_name: firstName, last_name: lastName }));
+      // Fetch real profile from backend
+      const profileResp = await api.authenticatedRequest('/auth/profile/');
+      if (profileResp.ok) {
+        const profileData = await profileResp.json();
+        localStorage.setItem('user_profile', JSON.stringify(profileData));
+      }
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

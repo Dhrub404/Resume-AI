@@ -15,6 +15,25 @@ class TemplateViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TemplateSerializer
     permission_classes = [IsAuthenticated]
 
+    @action(detail=True, methods=['post'])
+    def use(self, request, pk=None):
+        """
+        Clone a template into a new personal Resume for the authenticated user.
+        The original template is NEVER modified.
+        """
+        template = self.get_object()
+        import copy
+        cloned_content = copy.deepcopy(template.content) if template.content else {}
+        
+        resume = Resume.objects.create(
+            user=request.user,
+            title=f"{template.name} Resume",
+            template=template,
+            content=cloned_content,
+        )
+        return Response(ResumeSerializer(resume).data, status=status.HTTP_201_CREATED)
+
+
 class ResumeViewSet(viewsets.ModelViewSet):
     serializer_class = ResumeSerializer
     permission_classes = [IsAuthenticated]
