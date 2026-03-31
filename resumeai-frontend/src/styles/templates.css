@@ -52,9 +52,17 @@
 }
 
 .filter-btn.active {
-  background: var(--bg-active);
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: transparent;
+  color: #fff;
+}
+
+.filter-active-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 20px;
+  z-index: 0;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .templates-grid {
@@ -70,10 +78,15 @@
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.3s;
+  will-change: transform, opacity, filter;
+  transition: border-color 0.3s ease;
 }
 
 .tpl-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px -15px rgba(0, 0, 0, 0.3),
+    0 15px 25px -10px rgba(0, 0, 0, 0.2);
   border-color: var(--accent);
 }
 
@@ -90,6 +103,7 @@
   justify-content: center;
   position: relative;
   border-bottom: 1px solid var(--border-color);
+  will-change: transform;
 }
 
 .tpl-preview::before {
@@ -103,8 +117,7 @@
 .tpl-preview > div {
   position: relative;
   z-index: 1;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-  transform: scale(1.4);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
 }
 
 .tpl-badge {
@@ -215,18 +228,4 @@
 
 .tpl-use-btn:hover {
   background: var(--accent-hover);
-}
-
-.tpl-card:nth-child(1) { animation-delay: 0.05s; }
-.tpl-card:nth-child(2) { animation-delay: 0.10s; }
-.tpl-card:nth-child(3) { animation-delay: 0.15s; }
-.tpl-card:nth-child(4) { animation-delay: 0.20s; }
-.tpl-card:nth-child(5) { animation-delay: 0.25s; }
-.tpl-card:nth-child(6) { animation-delay: 0.30s; }
-.tpl-card:nth-child(7) { animation-delay: 0.35s; }
-.tpl-card:nth-child(8) { animation-delay: 0.40s; }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
 }

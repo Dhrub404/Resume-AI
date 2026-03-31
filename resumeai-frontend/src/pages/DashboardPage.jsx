@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { tapEffect } from '../utils/motionVariants';
+import { staggerContainer, slideUpItem, scaleHover, premiumCardVariants, waveCardVariants, waveContainerVariants, TRANSITIONS } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import { api } from '../api';
 import '../styles/dashboard.css';
 
-// ── Animation Variants ──
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.45, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] } }),
-};
-
-const cardHover = {
-  rest: { scale: 1, boxShadow: '0 0px 0px rgba(0,0,0,0)' },
-  hover: { scale: 1.025, boxShadow: '0 16px 40px -8px rgba(0,0,0,0.4)', transition: { duration: 0.22, ease: 'easeOut' } },
-};
-
-// ── Static Data ──
+// ── Icons (Previously defined) ──
 const quickActions = [
   {
     icon: (
@@ -141,43 +130,46 @@ export default function DashboardPage() {
     <AppLayout title="Dashboard">
 
       {/* ── Stats Row ── */}
-      <div className="stats-row">
+      <motion.div 
+        className="stats-row"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+      >
         {stats.map((s, i) => (
           <motion.div
             key={s.label}
             className="stat-card"
-            custom={i}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
+            variants={premiumCardVariants}
             whileHover="hover"
+            whileTap="tap"
             style={{ '--stat-color': s.color, '--stat-bg': s.bg }}
           >
-            <div className="stat-inner">
+            <motion.div className="stat-inner">
               <div className="stat-icon-row">
                 <span className="stat-emoji">{s.icon}</span>
                 <div className={`stat-badge badge-${s.badgeType || 'up'}`}>{s.badge}</div>
               </div>
               <div className="stat-val" style={s.color ? { color: s.color } : {}}>{s.value}</div>
               <div className="stat-label">{s.label}</div>
-            </div>
+            </motion.div>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* ── Quick Actions ── */}
-      <motion.div variants={fadeUp} custom={4} initial="hidden" animate="show">
+      <motion.div variants={slideUpItem} initial="hidden" animate="show">
         <div className="section-head">
           <div className="section-title">Quick Actions</div>
         </div>
-        <div className="quick-actions-grid">
+        <motion.div className="quick-actions-grid" variants={staggerContainer}>
           {quickActions.map((qa, i) => (
             <motion.div
               key={qa.label}
               className="qa-card"
-              initial="rest"
+              variants={premiumCardVariants}
               whileHover="hover"
-              custom={i}
+              whileTap="tap"
               onClick={() => navigate(qa.path)}
               style={{ '--qa-color': qa.color, '--qa-bg': qa.bg }}
             >
@@ -185,15 +177,15 @@ export default function DashboardPage() {
                 <div className="qa-icon" style={{ background: qa.bg, color: qa.color }}>{qa.icon}</div>
                 <div className="qa-label">{qa.label}</div>
                 <div className="qa-desc">{qa.desc}</div>
-                <div className="qa-arrow" style={{ color: qa.color }}>→</div>
+                <motion.div className="qa-arrow" style={{ color: qa.color }}>→</motion.div>
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* ── My Resumes ── */}
-      <motion.div variants={fadeUp} custom={5} initial="hidden" animate="show" style={{ marginTop: '2rem' }}>
+      <motion.div variants={slideUpItem} initial="hidden" animate="show" style={{ marginTop: '2rem' }}>
         <div className="section-head">
           <div className="section-title">My Resumes</div>
           <div className="section-link" onClick={() => navigate('/templates')}>+ New Resume →</div>
@@ -223,8 +215,14 @@ export default function DashboardPage() {
             </motion.button>
           </motion.div>
         ) : (
-          <div className="resumes-grid">
-            <AnimatePresence>
+          <motion.div 
+            className="resumes-grid"
+            variants={waveContainerVariants}
+            initial="hidden"
+            animate="show"
+            layout // Framer Motion layout prop for smooth grid re-arranges
+          >
+            <AnimatePresence mode="popLayout">
               {resumes.map((r, i) => {
                 const score = r.score || 0;
                 const scoreClass = score > 80 ? 'score-hi' : (score > 50 ? 'score-mid' : 'score-lo');
@@ -232,11 +230,10 @@ export default function DashboardPage() {
                   <motion.div
                     key={r.id}
                     className="resume-card"
-                    custom={i}
-                    variants={fadeUp}
-                    initial="hidden"
-                    animate="show"
-                    whileHover={{ y: -6, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.4)', borderColor: 'rgba(59,130,246,0.35)', transition: { duration: 0.2 } }}
+                    variants={waveCardVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    layout
                     onClick={() => navigate(`/builder?id=${r.id}`)}
                   >
                     <div className="rc-preview">
@@ -257,53 +254,60 @@ export default function DashboardPage() {
                 );
               })}
             </AnimatePresence>
-          </div>
+          </motion.div>
         )}
       </motion.div>
 
       {/* ── Bottom Row: Activity + Tips ── */}
-      <motion.div className="bottom-row" variants={fadeUp} custom={6} initial="hidden" animate="show" style={{ marginTop: '2rem' }}>
-        <div className="activity-card">
+      <motion.div 
+        className="bottom-row" 
+        variants={staggerContainer}
+        initial="hidden" 
+        animate="show" 
+        style={{ marginTop: '2rem' }}
+      >
+        <motion.div className="activity-card" variants={slideUpItem}>
           <div className="section-head">
             <div className="section-title">Recent Activity</div>
             <span className="live-indicator"><span className="live-dot-sm" />Live</span>
           </div>
-          {activities.map((a, i) => (
-            <motion.div
-              className="act-item"
-              key={i}
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 + i * 0.07 }}
-            >
-              <div className="act-dot" style={{ background: a.color }} />
-              <div className="act-text">{a.text}</div>
-              <div className="act-time">{a.time}</div>
-            </motion.div>
-          ))}
-        </div>
+          <motion.div variants={staggerContainer} initial="hidden" animate="show">
+            {activities.map((a, i) => (
+              <motion.div
+                className="act-item"
+                key={i}
+                variants={slideUpItem}
+                whileHover={{ x: 6, transition: TRANSITIONS.premiumSpring }}
+              >
+                <div className="act-dot" style={{ background: a.color }} />
+                <div className="act-text">{a.text}</div>
+                <div className="act-time">{a.time}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
 
-        <div className="tips-card">
+        <motion.div className="tips-card" variants={slideUpItem}>
           <div className="section-head">
             <div className="section-title">💡 Tips</div>
           </div>
-          {tips.map((t, i) => (
-            <motion.div
-              className="tip-item"
-              key={i}
-              whileHover={{ scale: 1.025, x: 4, transition: { duration: 0.18 } }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + i * 0.08 }}
-            >
-              <div className="tip-icon">{t.emoji}</div>
-              <div>
-                <div className="tip-title">{t.title}</div>
-                <div className="tip-desc">{t.desc}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+          <motion.div variants={staggerContainer} initial="hidden" animate="show">
+            {tips.map((t, i) => (
+              <motion.div
+                className="tip-item"
+                key={i}
+                variants={slideUpItem}
+                whileHover={{ scale: 1.025, x: 4, transition: { duration: 0.18 } }}
+              >
+                <div className="tip-icon">{t.emoji}</div>
+                <div>
+                  <div className="tip-title">{t.title}</div>
+                  <div className="tip-desc">{t.desc}</div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
       </motion.div>
 
     </AppLayout>

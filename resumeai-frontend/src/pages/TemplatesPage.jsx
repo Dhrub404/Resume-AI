@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { staggerContainer, slideUpItem, scaleHover, tapEffect } from '../utils/motionVariants';
+import { staggerContainer, slideUpItem, scaleHover, tapEffect, waveCardVariants, thumbnailHoverVariant, TRANSITIONS } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import { api } from '../api';
 import '../styles/templates.css';
@@ -153,35 +153,51 @@ export default function TemplatesPage() {
             key={f} 
             className={`filter-btn ${activeFilter === f ? 'active' : ''}`} 
             onClick={() => setActiveFilter(f)}
+            style={{ position: 'relative' }}
           >
-            {f}
+            {activeFilter === f && (
+              <motion.div 
+                layoutId="active-pill"
+                className="filter-active-bg"
+                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span style={{ position: 'relative', zIndex: 10 }}>{f}</span>
           </motion.button>
         ))}
       </motion.div>
 
       <motion.div className="templates-grid" layout>
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {templates.filter(t => activeFilter === 'All' || t.category === activeFilter).map(t => {
             const badgeInfo = badgeMap[t.id];
             return (
               <motion.div 
                 key={t.id} 
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                whileHover={{ y: -8, boxShadow: "0 25px 30px -5px rgba(0, 0, 0, 0.5)", scale: 1.02 }}
+                variants={waveCardVariants}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                whileHover="hover"
                 className={`tpl-card ${selected === t.id ? 'selected' : ''}`} 
                 onClick={() => setSelected(t.id)}
               >
                 <div className="tpl-preview">
-                  {thumbs[t.slug] || thumbs['modern']}
+                  <motion.div variants={thumbnailHoverVariant} style={{ transform: 'scale(1.4)' }}>
+                    {thumbs[t.slug] || thumbs['modern']}
+                  </motion.div>
                   {badgeInfo && <div className={`tpl-badge badge-${badgeInfo.badge}`}>{badgeInfo.label}</div>}
                   {selected === t.id && (
-                    <div className="selected-check">
+                    <motion.div 
+                      key="check"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={TRANSITIONS.elastic}
+                      className="selected-check"
+                    >
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
                 <div className="tpl-body">
