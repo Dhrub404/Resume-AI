@@ -4,7 +4,8 @@ import { api } from '../api';
 import '../styles/builder.css';
 
 import ContentPanel from '../components/builder/ContentPanel';
-import StylePanel, { THEME_PRESETS } from '../components/builder/StylePanel';
+import StylePanel from '../components/builder/StylePanel';
+import { THEME_PRESETS } from '../utils/themeConstants';
 
 // ── Icons (Dynamically styled based on iconStyle) ──
 const getIconProps = (style) => ({

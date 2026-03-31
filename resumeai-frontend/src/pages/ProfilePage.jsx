@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout';
 import { useUser } from '../context/UserContext';
 import { api } from '../api';
@@ -28,7 +28,6 @@ const getPasswordStrength = (pw) => {
 };
 
 export default function ProfilePage() {
-  const navigate = useNavigate();
   const { user: contextUser, isLoaded, updateUser } = useUser();
   
   // ── Build display name dynamically from context ──
@@ -45,15 +44,6 @@ export default function ProfilePage() {
     location: '',
     avatar: '',
   });
-  
-  // Sync context → local state whenever context user updates
-  useEffect(() => {
-    if (contextUser) {
-      const name = getName(contextUser);
-      setProfileData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
-      setFormData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
-    }
-  }, [contextUser]);
 
   const [settings, setSettings] = useState({
     emailNotifications: true,
@@ -71,6 +61,15 @@ export default function ProfilePage() {
   // ── Edit Mode ──
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ ...profileData });
+  
+  // Sync context → local state whenever context user updates
+  useEffect(() => {
+    if (contextUser) {
+      const name = getName(contextUser);
+      setProfileData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
+      setFormData(prev => ({ ...prev, name, email: contextUser.email || prev.email }));
+    }
+  }, [contextUser]);
   
   // ── Password State ──
   const [passwords, setPasswords] = useState({ current: '', newPw: '', confirm: '' });

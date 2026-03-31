@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { staggerContainer, slideUpItem, scaleHover } from '../utils/motionVariants';
+import { tapEffect } from '../utils/motionVariants';
 import AppLayout from '../components/layout/AppLayout';
 import { api } from '../api';
 import '../styles/dashboard.css';
@@ -129,14 +129,12 @@ export default function DashboardPage() {
   const bestScore = resumes.length > 0 ? Math.max(...resumes.map(r => r.score || 0)) : null;
 
   const stats = [
-    { label: 'Total Resumes', value: isLoading ? '…' : resumes.length, badge: 'Active count', badgeType: 'up', icon: '📄' },
-    { label: 'Best ATS Score', value: isLoading ? '…' : (bestScore ?? '--'), badge: 'Across all', badgeType: bestScore > 75 ? 'up' : 'neutral', icon: '🎯', color: bestScore > 75 ? '#10b981' : '#f59e0b' },
-    { label: 'AI Suggestions', value: 24, badge: 'Used this month', badgeType: 'up', icon: '✨' },
-    { label: 'PDF Downloads', value: 7, badge: 'All time', badgeType: 'up', icon: '⬇️' },
+    { label: 'Total Resumes', value: isLoading ? '…' : resumes.length, badge: 'Active count', badgeType: 'up', icon: '📄', color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
+    { label: 'Best ATS Score', value: isLoading ? '…' : (bestScore ?? '--'), badge: 'Across all', badgeType: (bestScore && bestScore > 75) ? 'up' : 'neutral', icon: '🎯', color: (bestScore && bestScore > 75) ? '#10b981' : '#f59e0b', bg: (bestScore && bestScore > 75) ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)' },
+    { label: 'AI Suggestions', value: 24, badge: 'Used this month', badgeType: 'up', icon: '✨', color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
+    { label: 'PDF Downloads', value: 7, badge: 'All time', badgeType: 'up', icon: '⬇️', color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
   ];
 
-  // 3 most recent resumes for the "Recent" strip
-  const recentResumes = resumes.slice(0, 3);
   const thumbColors = ['#4F6EF7', '#10b981', '#a855f7'];
 
   return (
@@ -152,14 +150,17 @@ export default function DashboardPage() {
             variants={fadeUp}
             initial="hidden"
             animate="show"
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            whileHover="hover"
+            style={{ '--stat-color': s.color, '--stat-bg': s.bg }}
           >
-            <div className="stat-icon-row">
-              <span className="stat-emoji">{s.icon}</span>
-              <div className={`stat-badge badge-${s.badgeType || 'up'}`}>{s.badge}</div>
+            <div className="stat-inner">
+              <div className="stat-icon-row">
+                <span className="stat-emoji">{s.icon}</span>
+                <div className={`stat-badge badge-${s.badgeType || 'up'}`}>{s.badge}</div>
+              </div>
+              <div className="stat-val" style={s.color ? { color: s.color } : {}}>{s.value}</div>
+              <div className="stat-label">{s.label}</div>
             </div>
-            <div className="stat-val" style={s.color ? { color: s.color } : {}}>{s.value}</div>
-            <div className="stat-label">{s.label}</div>
           </motion.div>
         ))}
       </div>
@@ -174,17 +175,18 @@ export default function DashboardPage() {
             <motion.div
               key={qa.label}
               className="qa-card"
-              variants={cardHover}
               initial="rest"
               whileHover="hover"
               custom={i}
               onClick={() => navigate(qa.path)}
               style={{ '--qa-color': qa.color, '--qa-bg': qa.bg }}
             >
-              <div className="qa-icon" style={{ background: qa.bg, color: qa.color }}>{qa.icon}</div>
-              <div className="qa-label">{qa.label}</div>
-              <div className="qa-desc">{qa.desc}</div>
-              <div className="qa-arrow" style={{ color: qa.color }}>→</div>
+              <div className="qa-inner">
+                <div className="qa-icon" style={{ background: qa.bg, color: qa.color }}>{qa.icon}</div>
+                <div className="qa-label">{qa.label}</div>
+                <div className="qa-desc">{qa.desc}</div>
+                <div className="qa-arrow" style={{ color: qa.color }}>→</div>
+              </div>
             </motion.div>
           ))}
         </div>

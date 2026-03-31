@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { api } from '../api';
-
-const UserContext = createContext(null);
+import UserContext from './UserContextInstance';
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -12,7 +11,11 @@ export function UserProvider({ children }) {
       // Step 1: Immediately load from cache so sidebar is never empty
       const cached = localStorage.getItem('user_profile');
       if (cached) {
-        try { setUser(JSON.parse(cached)); } catch {}
+        try {
+          setUser(JSON.parse(cached));
+        } catch (e) {
+          console.warn('Failed to parse cached user:', e);
+        }
       }
 
       // Step 2: Try to fetch fresh data from backend
@@ -58,5 +61,3 @@ export function useUser() {
   if (!context) throw new Error('useUser must be used within a UserProvider');
   return context;
 }
-
-export default UserContext;
