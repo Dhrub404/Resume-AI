@@ -19,25 +19,23 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: background 0.3s ease, border-color 0.3s ease;
-  will-change: transform, opacity;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
 .stat-inner {
   position: relative;
-  z-index: 2;
+  z-index: 2; /* Ensures content is above the background circle */
   background: transparent;
-  border-radius: 14px;
-  padding: 1.25rem 1.4rem;
+  border-radius: 14px; /* Inner curve matching the outer card's theme */
+  padding: 1.25rem 1.4rem; /* Breathing room for text inside the white hover area */
   width: 100%;
   height: 100%;
-  transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, background, box-shadow;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .stat-card:hover .stat-inner {
-  background: var(--bg-card); /* Floating effect */
-  box-shadow: var(--shadow-premium);
+  background: var(--bg-card); /* Floating effect with solid background */
+  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.25);
   transform: translateY(-2px);
 }
 
@@ -114,10 +112,9 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.3s, background 0.3s ease;
+  transition: border-color 0.2s, background 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  will-change: transform, opacity;
 }
 
 .qa-inner {
@@ -128,15 +125,14 @@
   padding: 1.25rem 1.4rem;
   width: 100%;
   height: 100%;
-  transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  will-change: transform, background, box-shadow;
 }
 
 .qa-card:hover .qa-inner {
   background: var(--bg-card);
-  box-shadow: var(--shadow-premium);
+  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.25);
   transform: translateY(-2px);
 }
 
@@ -248,14 +244,7 @@
   border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
-}
-
-.resume-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-premium);
-  transform: translateY(-4px);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .rc-preview {
