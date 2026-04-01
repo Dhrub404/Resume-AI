@@ -68,16 +68,22 @@ const AppLayout = ({ title, children, topbarRight }) => {
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showProModal, setShowProModal] = useState(false);
   const scrollRef = useRef(null);
   const notifRef = useRef(null);
+  const profileRef = useRef(null);
 
-  // Close notifications on click outside
+  // Close dropdowns on click outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setShowNotif(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -123,19 +129,38 @@ const AppLayout = ({ title, children, topbarRight }) => {
     <div className="app-layout">
       {/* Sidebar */}
       <motion.aside 
-        className="app-sidebar"
+        className={`app-sidebar ${isCollapsed ? 'collapsed' : ''}`}
         initial={false}
         animate={{ 
           x: isSidebarOpen ? 0 : '-100%',
-          opacity: 1 // Keep opacity 1 so it doesn't fade while sliding out
+          width: isCollapsed ? 80 : 260,
+          opacity: 1 
         }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
       >
         <div className="sidebar-branding">
           {isSidebarOpen && (
             <>
-              <BrandLogo onClick={() => navigate('/dashboard')} />
-              <ToggleBtn isOpen={isSidebarOpen} onClick={() => setIsSidebarOpen(false)} />
+              {!isCollapsed && <BrandLogo onClick={() => navigate('/dashboard')} />}
+              {isCollapsed && (
+                <motion.div 
+                  className="logo-collapsed" 
+                  onClick={() => navigate('/dashboard')}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  RAI
+                </motion.div>
+              )}
+              <motion.button 
+                className="collapse-toggle"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d={isCollapsed ? "M13 17l5-5-5-5M6 17l5-5-5-5" : "M11 17l-5-5 5-5M18 17l-5-5 5-5"} />
+                </svg>
+              </motion.button>
             </>
           )}
         </div>
@@ -160,25 +185,59 @@ const AppLayout = ({ title, children, topbarRight }) => {
                   </>
                 )}
                 <div className="nav-item-content">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
+                  <motion.svg 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor"
+                    whileHover={{ scale: 1.1 }}
+                  >
                     <path d={item.icon}/>
-                  </svg>
-                  <span>{item.name}</span>
+                  </motion.svg>
+                  <AnimatePresence>
+                    {!isCollapsed && (
+                      <motion.span
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {item.name}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             );
           })}
         </nav>
         <div className="sidebar-bottom">
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }} className="user-profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
-            <div className="user-avatar">{userInitial}</div>
-            <div className="user-info">
-              <span className="user-name">{displayName}</span>
-              <span className="user-email">{displayEmail}</span>
-            </div>
-          </motion.div>
-          <motion.div whileHover={{ backgroundColor: "rgba(251, 113, 133, 0.15)" }} whileTap={{ scale: 0.96 }} className="logout-btn" onClick={handleLogout}>
-            Log Out
+          <AnimatePresence modal={false}>
+            {!isCollapsed && (
+              <motion.div 
+                layoutId="profile-section"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="user-profile" 
+                onClick={() => navigate('/profile')}
+              >
+                <motion.div layoutId="avatar" className="user-avatar">{userInitial}</motion.div>
+                <div className="user-info">
+                  <span className="user-name">{displayName}</span>
+                  <span className="user-email">{displayEmail}</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div 
+            whileHover={{ backgroundColor: "rgba(251, 113, 133, 0.15)" }} 
+            whileTap={{ scale: 0.96 }} 
+            className="logout-btn" 
+            onClick={handleLogout}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+            </svg>
+            {!isCollapsed && <span>Log Out</span>}
           </motion.div>
         </div>
       </motion.aside>
@@ -187,7 +246,7 @@ const AppLayout = ({ title, children, topbarRight }) => {
       <motion.div 
         className="app-main"
         initial={false}
-        animate={{ marginLeft: isSidebarOpen ? '260px' : '0px' }}
+        animate={{ marginLeft: isSidebarOpen ? (isCollapsed ? 80 : 260) : 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
       >
         {/* Header */}
@@ -229,8 +288,42 @@ const AppLayout = ({ title, children, topbarRight }) => {
               className="btn-upgrade"
               onClick={() => setShowProModal(true)}
             >
-              Upgrade to Pro
+              {!isCollapsed ? 'Upgrade to Pro' : 'Pro'}
             </motion.button>
+            
+            {/* Navbar Profile Dropdown (Only when collapsed) */}
+            <AnimatePresence>
+              {isCollapsed && (
+                <div className="navbar-profile-wrap" ref={profileRef} style={{ marginLeft: 10 }}>
+                  <motion.div 
+                    layoutId="avatar"
+                    className="navbar-avatar"
+                    onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {userInitial}
+                  </motion.div>
+                  
+                  {showProfileDropdown && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="profile-dropdown"
+                    >
+                      <div className="dropdown-user-info">
+                        <p>{displayName}</p>
+                        <span>{displayEmail}</span>
+                      </div>
+                      <div className="dropdown-divider" />
+                      <button onClick={() => { navigate('/profile'); setShowProfileDropdown(false); }}>Profile Settings</button>
+                      <button className="logout" onClick={handleLogout}>Log Out</button>
+                    </motion.div>
+                  )}
+                </div>
+              )}
+            </AnimatePresence>
             
             <div className="notif-wrapper" ref={notifRef} style={{ position: 'relative' }}>
               <motion.div 
