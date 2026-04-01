@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import { useUser as useUserHook } from '../../context/UserContext';
 import { useTheme } from '../../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { pageTransition } from '../../utils/motionVariants';
@@ -22,43 +23,20 @@ const MoonIcon = () => (
   </svg>
 );
 
-const BrandLogo = ({ className = "", onClick }) => (
+const BrandLogo = ({ isCollapsed, onClick }) => (
   <motion.div 
-    layoutId="main-logo"
-    className={`sidebar-logo ${className}`} 
+    layout
+    className="sidebar-logo" 
     onClick={onClick}
-    style={{ marginBottom: 0, padding: 0 }}
-    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+    style={{ 
+      marginBottom: 0, 
+      padding: isCollapsed ? "0" : "0 1.5rem",
+      justifyContent: isCollapsed ? "center" : "flex-start" 
+    }}
   >
     <div className="logo-icon">RAI</div>
-    <span className="logo-text">Resume<span>AI</span></span>
+    {!isCollapsed && <motion.span initial={{ opacity: 1 }} animate={{ opacity: 1 }} className="logo-text">Resume<span>AI</span></motion.span>}
   </motion.div>
-);
-
-const ToggleBtn = ({ isOpen, onClick }) => (
-  <motion.button 
-    layoutId="hamburger-toggle"
-    className="hamburger-btn"
-    onClick={onClick}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    transition={{ type: "spring", damping: 25, stiffness: 200 }}
-  >
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <motion.path
-        animate={{ d: isOpen ? "M12 5l-7 7" : "M4 6h16" }}
-        transition={{ duration: 0.3 }}
-      />
-      <motion.path
-        animate={{ d: isOpen ? "M5 12h14" : "M4 12h16" }}
-        transition={{ duration: 0.3 }}
-      />
-      <motion.path
-        animate={{ d: isOpen ? "M12 19l-7-7" : "M4 18h16" }}
-        transition={{ duration: 0.3 }}
-      />
-    </svg>
-  </motion.button>
 );
 
 const AppLayout = ({ title, children, topbarRight }) => {
@@ -67,23 +45,41 @@ const AppLayout = ({ title, children, topbarRight }) => {
   const { user, clearUser } = useUser();
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showProModal, setShowProModal] = useState(false);
   const scrollRef = useRef(null);
   const notifRef = useRef(null);
-  const profileRef = useRef(null);
 
-  // Close dropdowns on click outside
+  // Build display name
+  const displayName = user
+    ? (`${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || user.email || 'User')
+    : 'User';
+  
+  const displayEmail = user?.email || '';
+  const userInitial = displayName.charAt(0).toUpperCase();
+
+  const UserProfile = ({ collapsed = false }) => (
+    <motion.div 
+      className={`user-profile ${collapsed ? 'navbar-profile' : ''}`} 
+      onClick={() => navigate('/profile')}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="user-avatar">{userInitial}</div>
+      {!collapsed && (
+        <div className="user-info">
+          <span className="user-name">{displayName}</span>
+          <span className="user-email">{displayEmail}</span>
+        </div>
+      )}
+    </motion.div>
+  );
+
+  // Close notifications on click outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setShowNotif(false);
-      }
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setShowProfileDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -117,160 +113,80 @@ const AppLayout = ({ title, children, topbarRight }) => {
     { name: 'ATS Analysis', path: '/analysis', icon: 'M5 20h2V10H5v10zm6 0h2V4h-2v16zm6 0h2v-8h-2v8z' },
   ];
 
-  // Build display name with multiple fallbacks — NEVER shows "Loading..."
-  const displayName = user
-    ? (`${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || user.email || 'User')
-    : 'User';
-  
-  const displayEmail = user?.email || '';
-  const userInitial = displayName.charAt(0).toUpperCase();
-
   return (
     <div className="app-layout">
       {/* Sidebar */}
       <motion.aside 
         className={`app-sidebar ${isCollapsed ? 'collapsed' : ''}`}
         initial={false}
-        animate={{ 
-          x: isSidebarOpen ? 0 : '-100%',
-          width: isCollapsed ? 80 : 260,
-          opacity: 1 
-        }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        animate={{ width: isCollapsed ? 80 : 260 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
       >
         <div className="sidebar-branding">
-          {isSidebarOpen && (
-            <>
-              {!isCollapsed && <BrandLogo onClick={() => navigate('/dashboard')} />}
-              {isCollapsed && (
-                <motion.div 
-                  className="logo-collapsed" 
-                  onClick={() => navigate('/dashboard')}
-                  whileHover={{ scale: 1.1 }}
-                >
-                  RAI
-                </motion.div>
-              )}
-              <motion.button 
-                className="collapse-toggle"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d={isCollapsed ? "M13 17l5-5-5-5M6 17l5-5-5-5" : "M11 17l-5-5 5-5M18 17l-5-5 5-5"} />
-                </svg>
-              </motion.button>
-            </>
-          )}
+          <BrandLogo isCollapsed={isCollapsed} onClick={() => navigate('/dashboard')} />
+          <button className={`hamburger-btn ${isCollapsed ? 'collapsed-center' : 'mini'}`} onClick={() => setIsCollapsed(!isCollapsed)}>
+            {isCollapsed ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            )}
+          </button>
         </div>
-        <nav className="sidebar-nav" style={{ paddingTop: '1rem' }}>
+        
+        <nav className="sidebar-nav">
           {navItems.map(item => {
             const isActive = location.pathname === item.path || (item.name === 'Resume Builder' && location.pathname === '/builder');
             return (
               <motion.div 
                 key={item.name}
-                whileHover={{ x: 4, backgroundColor: !isActive ? "rgba(255, 255, 255, 0.05)" : "transparent" }}
-                whileTap={{ scale: 0.97 }}
-                className={`nav-item ${isActive ? 'active' : ''}`}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.1, ease: "easeOut" }}
+                className={`nav-item ${isActive ? 'active' : ''} ${isCollapsed ? 'centered' : ''}`}
                 onClick={() => {
                   if (item.name === 'Resume Builder') navigate('/templates');
                   else navigate(item.path);
                 }}
               >
-                {isActive && (
-                  <>
-                    <motion.div layoutId="nav-bg" className="nav-active-bg" initial={false} transition={{ type: "spring", damping: 22, stiffness: 250 }} />
-                    <motion.div layoutId="nav-indicator" className="nav-active-indicator" initial={false} transition={{ type: "spring", damping: 22, stiffness: 250 }} />
-                  </>
-                )}
                 <div className="nav-item-content">
-                  <motion.svg 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor"
-                    whileHover={{ scale: 1.1 }}
-                  >
+                  <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d={item.icon}/>
-                  </motion.svg>
-                  <AnimatePresence>
-                    {!isCollapsed && (
-                      <motion.span
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {item.name}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
+                  </svg>
+                  {!isCollapsed && <span>{item.name}</span>}
                 </div>
               </motion.div>
             );
           })}
         </nav>
-        <div className="sidebar-bottom">
-          <AnimatePresence modal={false}>
-            {!isCollapsed && (
-              <motion.div 
-                layoutId="profile-section"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="user-profile" 
-                onClick={() => navigate('/profile')}
-              >
-                <motion.div layoutId="avatar" className="user-avatar">{userInitial}</motion.div>
-                <div className="user-info">
-                  <span className="user-name">{displayName}</span>
-                  <span className="user-email">{displayEmail}</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <motion.div 
-            whileHover={{ backgroundColor: "rgba(251, 113, 133, 0.15)" }} 
-            whileTap={{ scale: 0.96 }} 
-            className="logout-btn" 
-            onClick={handleLogout}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
-            </svg>
-            {!isCollapsed && <span>Log Out</span>}
-          </motion.div>
-        </div>
+
+        {isCollapsed ? (
+          <div className="sidebar-bottom collapsed">
+            <button className="mini-logout-btn" onClick={handleLogout} title="Log Out">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            </button>
+          </div>
+        ) : (
+          <div className="sidebar-bottom">
+            <UserProfile />
+            <motion.div whileHover={{ backgroundColor: "rgba(251, 113, 133, 0.15)" }} className="logout-btn" onClick={handleLogout}>
+              Log Out
+            </motion.div>
+          </div>
+        )}
       </motion.aside>
 
       {/* Main Content Area */}
       <motion.div 
         className="app-main"
         initial={false}
-        animate={{ marginLeft: isSidebarOpen ? (isCollapsed ? 80 : 260) : 0 }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        animate={{ paddingLeft: isCollapsed ? 80 : 260 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
       >
         {/* Header */}
         <header className={`app-header ${isScrolled ? 'scrolled' : ''}`}>
           <div className="header-left">
-            {!isSidebarOpen && (
-              <ToggleBtn isOpen={isSidebarOpen} onClick={() => setIsSidebarOpen(true)} />
-            )}
-            <AnimatePresence mode="popLayout">
-              {!isSidebarOpen && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ display: 'flex', alignItems: 'center' }}
-                >
-                  <BrandLogo onClick={() => navigate('/dashboard')} />
-                  <span style={{ color: "var(--text-faint)", margin: "0 10px", fontSize: "1.2rem", fontWeight: 300 }}>|</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <h1 className="header-title" style={{ fontSize: "1.2rem", marginLeft: isSidebarOpen ? '0' : '8px' }}>{title}</h1>
+            <h1 className="header-title">{title}</h1>
           </div>
+          
           <div className="header-actions">
             {topbarRight}
             <motion.button
@@ -284,51 +200,15 @@ const AppLayout = ({ title, children, topbarRight }) => {
             </motion.button>
             <motion.button 
               whileHover={{ scale: 1.05 }} 
-              whileTap={{ scale: 0.95 }} 
               className="btn-upgrade"
               onClick={() => setShowProModal(true)}
             >
-              {!isCollapsed ? 'Upgrade to Pro' : 'Pro'}
+              Upgrade to Pro
             </motion.button>
-            
-            {/* Navbar Profile Dropdown (Only when collapsed) */}
-            <AnimatePresence>
-              {isCollapsed && (
-                <div className="navbar-profile-wrap" ref={profileRef} style={{ marginLeft: 10 }}>
-                  <motion.div 
-                    layoutId="avatar"
-                    className="navbar-avatar"
-                    onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {userInitial}
-                  </motion.div>
-                  
-                  {showProfileDropdown && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="profile-dropdown"
-                    >
-                      <div className="dropdown-user-info">
-                        <p>{displayName}</p>
-                        <span>{displayEmail}</span>
-                      </div>
-                      <div className="dropdown-divider" />
-                      <button onClick={() => { navigate('/profile'); setShowProfileDropdown(false); }}>Profile Settings</button>
-                      <button className="logout" onClick={handleLogout}>Log Out</button>
-                    </motion.div>
-                  )}
-                </div>
-              )}
-            </AnimatePresence>
             
             <div className="notif-wrapper" ref={notifRef} style={{ position: 'relative' }}>
               <motion.div 
-                whileHover={{ scale: 1.1, rotate: 10 }} 
-                whileTap={{ scale: 0.9 }} 
+                whileHover={{ scale: 1.1 }} 
                 className="notification-bell"
                 onClick={() => setShowNotif(!showNotif)}
               >
@@ -342,10 +222,10 @@ const AppLayout = ({ title, children, topbarRight }) => {
               <AnimatePresence>
                 {showNotif && (
                   <motion.div 
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.15 }}
                     className="notif-panel"
                   >
                     <div className="notif-header">
@@ -353,35 +233,22 @@ const AppLayout = ({ title, children, topbarRight }) => {
                       <button className="mark-read-btn">Mark all read</button>
                     </div>
                     <div className="notif-body">
+                      {/* Placeholder notifications */}
                       <div className="notif-item unread">
                         <div className="notif-icon" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>✨</div>
                         <div className="notif-content">
-                          <p><strong>AI Suggestions Ready!</strong> Your Software Engineer resume has 3 new tips.</p>
+                          <p><strong>AI Ready!</strong> 3 tips for your resume.</p>
                           <span>2m ago</span>
                         </div>
                       </div>
-                      <div className="notif-item">
-                        <div className="notif-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>🎯</div>
-                        <div className="notif-content">
-                          <p><strong>ATS Score Improved!</strong> You hit a new high score of 87/100.</p>
-                          <span>1hr ago</span>
-                        </div>
-                      </div>
-                      <div className="notif-item">
-                        <div className="notif-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}>📄</div>
-                        <div className="notif-content">
-                          <p><strong>Export Successful.</strong> Your requested PDF export is ready for viewing.</p>
-                          <span>1d ago</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="notif-footer">
-                      View all notifications
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Profile swapped to Navbar when collapsed */}
+            {isCollapsed && <UserProfile collapsed={true} />}
           </div>
         </header>
         
@@ -407,43 +274,23 @@ const AppLayout = ({ title, children, topbarRight }) => {
           <div className="modal-backdrop" onClick={() => setShowProModal(false)}>
             <motion.div 
               className="pro-modal"
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
               onClick={e => e.stopPropagation()}
             >
               <button className="modal-close-btn" onClick={() => setShowProModal(false)}>✕</button>
-              
               <div className="pro-modal-header">
                 <div className="pro-badge">PRO</div>
-                <h2>Unlock Your True Potential</h2>
-                <p>Get hired 3x faster with unlimited AI analysis and premium templates.</p>
+                <h2>Unlock Your Potential</h2>
+                <p>Get hired faster with AI analysis.</p>
               </div>
-
               <div className="pro-plans">
-                <div className="plan-card">
-                  <div className="plan-name">Basic</div>
-                  <div className="plan-price">$0<span>/mo</span></div>
-                  <ul className="plan-features">
-                    <li>✓ 1 Resume</li>
-                    <li>✓ 2 AI suggestions/mo</li>
-                    <li>✓ Basic templates</li>
-                    <li className="disabled">✕ ATS strict check</li>
-                  </ul>
-                  <button className="plan-btn current">Current Plan</button>
-                </div>
-
                 <div className="plan-card featured">
-                  <div className="featured-label">Most Popular</div>
-                  <div className="plan-name">Pro</div>
+                  <h3>Pro Plan</h3>
                   <div className="plan-price">$9<span>/mo</span></div>
-                  <ul className="plan-features">
-                    <li>✓ Unlimited Resumes</li>
-                    <li>✓ Unlimited AI Writes</li>
-                    <li>✓ 8+ Premium Templates</li>
-                    <li>✓ Deep ATS Analysis</li>
-                  </ul>
-                  <button className="plan-btn upgrade" onClick={() => setShowProModal(false)}>Upgrade to Pro</button>
+                  <button className="plan-btn upgrade" onClick={() => setShowProModal(false)}>Upgrade Now</button>
                 </div>
               </div>
             </motion.div>
