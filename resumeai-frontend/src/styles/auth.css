@@ -4,26 +4,40 @@
   display: flex;
   min-height: 100vh;
   width: 100vw;
-  background-color: var(--bg-app);
+  background-color: #020617; /* Deep midnight for Three.js scene */
   color: var(--text-primary);
   overflow: hidden;
+  position: relative;
+}
+
+.three-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ════════ SIDEBAR (Left) ════════ */
 .auth-sidebar {
   width: 40%;
   max-width: 500px;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: rgba(15, 23, 42, 0.65) !important; /* Glassmorphism for Three.js visibility */
+  backdrop-filter: blur(12px);
   padding: 3rem;
   display: flex;
   flex-direction: column;
   color: white;
   position: relative;
   overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="light"] .auth-sidebar {
-  background: linear-gradient(135deg, #1e293b 0%, #171d29 100%);
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: white; /* Maintain white text since background is now dark starfield */
 }
 
 .auth-sidebar::before {
@@ -143,7 +157,8 @@
   justify-content: center;
   padding: 2rem;
   position: relative;
-  background-color: var(--bg-app);
+  background: transparent !important;
+  perspective: 1000px; /* Crucial for 3D rotation */
 }
 
 .grid-bg {
@@ -163,20 +178,27 @@
   border: 1px solid var(--border-color);
   border-radius: 24px;
   padding: 2.5rem;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.4);
   z-index: 10;
-  animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 [data-theme="light"] .auth-card {
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.card-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: inherit;
 }
 
 .tab-bar {
@@ -279,7 +301,8 @@
 .form-input:focus {
   border-color: var(--accent);
   background: var(--bg-card);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  transform: translateZ(10px); /* Lift element inside 3D space */
 }
 
 .password-toggle {
@@ -326,8 +349,9 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px) translateZ(20px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.5);
+  filter: brightness(1.1);
 }
 
 .divider {
@@ -414,49 +438,27 @@
 /* Response for small screens */
 @media (max-width: 900px) {
   .auth-sidebar { display: none; }
-  .auth-main { background: var(--bg-app); }
+  .auth-main { background: transparent !important; }
   .auth-card { max-width: 400px; padding: 2rem; }
 }
 
 /* ════════ LIGHT THEME SPECIFIC OVERRIDES ════════ */
 [data-theme="light"] .auth-sidebar {
-  border-right-color: rgba(0, 0, 0, 0.05); /* Softer border */
+  border-right-color: rgba(255, 255, 255, 0.1); /* Softer border */
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
-/* 1. Headline visibility: Using a darker gradient for light mode */
-[data-theme="light"] .sidebar-headline {
-  background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+/* 1. Headline visibility (Stay bright on dark background) */
+/* (Removed incorrect dark overrides) */
 
-/* 2. Logo and subtext clarity */
-[data-theme="light"] .logo-text {
-  color: var(--text-primary);
-}
+/* 2. Logo and subtext clarity (Stay bright on dark background) */
+/* (Removed incorrect dark overrides) */
 
-[data-theme="light"] .logo-text span {
-  color: var(--accent);
-}
-
-[data-theme="light"] .sidebar-sub {
-  color: var(--text-secondary);
-}
-
-/* 3. Feature visibility */
-[data-theme="light"] .feature-info p {
-  color: var(--text-primary);
-}
-
-[data-theme="light"] .feature-info span {
-  color: var(--text-muted);
-}
+/* 3. Feature visibility (Stay bright on dark background) */
+/* (Removed incorrect dark overrides) */
 
 /* 4. Footer visibility */
-[data-theme="light"] .sidebar-footer {
-  color: var(--text-muted); /* More readable than faint in light mode */
-}
+/* (Removed incorrect dark overrides) */
 
 /* 5. Subtle background polish */
 [data-theme="light"] .auth-sidebar::before {

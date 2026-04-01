@@ -1,8 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars, Float } from '@react-three/drei';
 import { api } from '../api';
 import { useUser } from '../context/UserContext';
 import '../styles/auth.css';
+
+// ── Three.js Starfield Component ──
+function MovingStars({ mouseX, mouseY }) {
+  const starsRef = useRef();
+
+  useFrame(() => {
+    if (!starsRef.current) return;
+    // Map smoothed motion values to rotation
+    const targetRotateX = mouseY.get() * 0.15;
+    const targetRotateY = mouseX.get() * 0.15;
+    
+    // Smoothly interpolate rotation for that "anti-gravity" feel
+    starsRef.current.rotation.x += (targetRotateX - starsRef.current.rotation.x) * 0.05;
+    starsRef.current.rotation.y += (targetRotateY - starsRef.current.rotation.y) * 0.05;
+  });
+
+  return (
+    <Stars 
+      ref={starsRef} 
+      radius={100} 
+      depth={50} 
+      count={6000} 
+      factor={4} 
+      saturation={0} 
+      fade 
+      speed={1} 
+    />
+  );
+}
+
+const ThreeBackground = ({ mouseX, mouseY }) => {
+  return (
+    <div className="three-background">
+      <Canvas camera={{ position: [0, 0, 1], fv: 60 }}>
+        <Suspense fallback={null}>
+          <color attach="background" args={['#020617']} />
+          <fog attach="fog" args={['#020617', 1, 150]} />
+          
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} intensity={1} />
+          
+          <MovingStars mouseX={mouseX} mouseY={mouseY} />
+          
+          {/* Add a very subtle floating atmospheric dust */}
+          <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+            <Stars radius={50} depth={20} count={500} factor={2} saturation={0} fade />
+          </Float>
+        </Suspense>
+      </Canvas>
+    </div>
+  );
+};
 
 const GoogleIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24">
@@ -92,6 +147,58 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { updateUser } = useUser();
 
+  // ── Anti-Gravity (3D Tilt) Logic ──
+  const cardRef = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Smooth springs for fluid motion
+  const mouseX = useSpring(x, { damping: 20, stiffness: 150 });
+  const mouseY = useSpring(y, { damping: 20, stiffness: 150 });
+
+  // Map mouse position to rotation degrees
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [10, -10]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-10, 10]);
+
+  // Spotlight position
+  const spotlightX = useTransform(mouseX, [-0.5, 0.5], ["0%", "100%"]);
+  const spotlightY = useTransform(mouseY, [-0.5, 0.5], ["0%", "100%"]);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseXPos = e.clientX - rect.left;
+    const mouseYPos = e.clientY - rect.top;
+
+    // Normalize to -0.5 to 0.5
+    x.set(mouseXPos / width - 0.5);
+    y.set(mouseYPos / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  // ── Global Mouse Tracking for Background ──
+  const globalX = useMotionValue(0);
+  const globalY = useMotionValue(0);
+  const smoothGlobalX = useSpring(globalX, { damping: 50, stiffness: 200 });
+  const smoothGlobalY = useSpring(globalY, { damping: 50, stiffness: 200 });
+
+  useEffect(() => {
+    const handleGlobalMove = (e) => {
+      const normalizedX = (e.clientX / window.innerWidth) - 0.5;
+      const normalizedY = (e.clientY / window.innerHeight) - 0.5;
+      globalX.set(normalizedX);
+      globalY.set(normalizedY);
+    };
+    window.addEventListener('mousemove', handleGlobalMove);
+    return () => window.removeEventListener('mousemove', handleGlobalMove);
+  }, []);
+
   const resetState = () => {
     setError(null);
     setPassword('');
@@ -153,6 +260,7 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
+      <ThreeBackground mouseX={smoothGlobalX} mouseY={smoothGlobalY} />
       <aside className="auth-sidebar">
         <div className="logo">
           <div className="logo-icon">RAI</div>
@@ -180,7 +288,31 @@ export default function LoginPage() {
 
       <main className="auth-main">
         <div className="grid-bg" />
-        <div className="auth-card">
+        
+        <motion.div 
+          ref={cardRef}
+          className="auth-card"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            rotateX,
+            rotateY,
+            transformStyle: "preserve-3d",
+          }}
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Top-layer Spotlight (Glow that follows cursor) */}
+          <motion.div 
+            className="card-spotlight"
+            style={{
+              background: useTransform(
+                [spotlightX, spotlightY],
+                ([sx, sy]) => `radial-gradient(600px circle at ${sx} ${sy}, rgba(255,255,255,0.06), transparent 80%)`
+              )
+            }}
+          />
           <div className="tab-bar">
             <button
               className={`tab-btn ${tab === 'login' ? 'active' : ''}`}
@@ -339,7 +471,7 @@ export default function LoginPage() {
               </p>
             </form>
           )}
-        </div>
+        </motion.div>
       </main>
     </div>
   );

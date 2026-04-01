@@ -231,8 +231,6 @@ export default function DashboardPage() {
                     key={r.id}
                     className="resume-card"
                     variants={waveCardVariants}
-                    whileHover="hover"
-                    whileTap="tap"
                     layout
                     onClick={() => navigate(`/builder?id=${r.id}`)}
                   >
