@@ -1,7 +1,7 @@
 // api.js
 // A centralized fetch API wrapper to automatically attach JWT tokens to backend requests.
 
-const BASE_URL = 'http://127.0.0.1:8000/api';
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export const api = {
   // Login with email (username) and password
