@@ -1,14 +1,7 @@
 // api.js
 // A centralized fetch API wrapper to automatically attach JWT tokens to backend requests.
 
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-let BASE_URL = isLocal 
-  ? 'http://127.0.0.1:8000/api' 
-  : (import.meta.env.VITE_API_URL || '').replace(/\/$/, "");
-
-if (!isLocal && BASE_URL && !BASE_URL.endsWith('/api')) {
-  BASE_URL += '/api';
-}
+const BASE_URL = "https://resume-ai-1-2dmh.onrender.com/api";
 
 export const api = {
   // Login with email (username) and password
