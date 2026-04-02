@@ -18,6 +18,11 @@ class Resume(models.Model):
     template = models.ForeignKey(Template, on_delete=models.SET_NULL, null=True, blank=True)
     content = models.JSONField(default=dict, blank=True)
     score = models.IntegerField(default=0)
+    status = models.CharField(
+        max_length=10,
+        choices=[('TEMP', 'Temporary'), ('DRAFT', 'Draft'), ('PUBLISHED', 'Published')],
+        default='TEMP'
+    )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
