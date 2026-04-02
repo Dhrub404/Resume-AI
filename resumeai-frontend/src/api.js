@@ -1,7 +1,7 @@
 // api.js
 // A centralized fetch API wrapper to automatically attach JWT tokens to backend requests.
 
-const BASE_URL = "https://resume-ai-1-2dmh.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "https://resume-ai-1-2dmh.onrender.com/api";
 
 export const api = {
   // Login with email (username) and password
